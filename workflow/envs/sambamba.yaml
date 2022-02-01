@@ -1,0 +1,5 @@
+name: sambamba
+channels:
+  - bioconda
+dependencies:
+  - sambamba=0.8.0

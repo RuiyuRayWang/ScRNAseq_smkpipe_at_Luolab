@@ -1,0 +1,8 @@
+name: master
+channels:
+  - bioconda
+dependencies:
+  - umi_tools=1.1.2
+  - star=2.7.9
+  - sambamba=0.8.0
+  - subread=1.6.3

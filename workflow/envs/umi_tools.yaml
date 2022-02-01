@@ -1,0 +1,5 @@
+name: umi_tools
+channels:
+  - bioconda
+dependencies:
+  - umi_tools=1.1.2

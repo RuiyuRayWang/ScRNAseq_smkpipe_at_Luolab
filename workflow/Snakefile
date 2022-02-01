@@ -1,0 +1,11 @@
+configfile: "config/config.yaml"
+
+include: "rules/common.smk"
+include: "rules/pipeline.smk"
+
+rule all:
+    input:
+    # Final outputs
+        # get_files('umi_tools_whitelist'),
+        parse_dynamic_output('append_sfx'),
+        get_aggr_output()
