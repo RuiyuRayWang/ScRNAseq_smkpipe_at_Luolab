@@ -19,7 +19,7 @@ subread (>=1.6.3)
 
 Once your environment is built, edit `sample_table.csv` and `config.yaml` files in the `config/` directory. Depending on your system specifications, you may also need to manually edit some parameters in the workflow (i.e. `pipeline.smk`).
 
-Activate a shell prompt, change to main directory of the pipeline (i.e. `Smartseq2_smkpipe_at_Luolab/`) and type
+Activate a shell prompt, change to main directory of the pipeline (i.e. `ScRNAseq_smkpipe_at_Luolab/`) and type
 
 ```
 snakemake --cores XX
@@ -163,7 +163,7 @@ zcat SAMPLE1_counts.tsv.gz SAMPLE2_counts.tsv.gz ... | gzip > outs/counts_all.ts
 An abstracted workflow is illustrated in the graph below:
 
 <p align="center">
-  <img width="200"  src="https://github.com/RuiyuRayWang/Smartseq2_smkpipe_at_Luolab/blob/main/rulegraph.svg">
+  <img width="200"  src="https://github.com/RuiyuRayWang/ScRNAseq_smkpipe_at_Luolab/blob/main/rulegraph.svg">
 </p>
 
 ## Notes
