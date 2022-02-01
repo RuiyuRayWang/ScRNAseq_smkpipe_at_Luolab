@@ -6,6 +6,8 @@ SJ.out.tab
 .snakemake/*
 workflow/data/*
 config/sample*.csv
+config/barcode_ground_truth_checklist_1.xlsx
+config/barcode_ground_truth_checklist_2.xlsx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
