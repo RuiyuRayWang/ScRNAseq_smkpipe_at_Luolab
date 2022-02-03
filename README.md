@@ -9,9 +9,9 @@ Install `python (>=3.1.0)` and `pandas (>=1.1.0)` as a minimum requirement.
 
 Make a fresh installation of [`Snakemake`](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html). 
 
-If you dicide to use the [`Integrated Package Management`](https://snakemake.readthedocs.io/en/stable/snakefiles/deployment.html) feature of Snakemake, you can skip the rest of this section. The pipeline will automatically build most of the required environment configured in the `workflow/envs/...yaml` when you activate the `--use-conda` flag. 
+If you decide to use the [`Integrated Package Management`](https://snakemake.readthedocs.io/en/stable/snakefiles/deployment.html) feature of Snakemake, you can skip the rest of this section. The pipeline will automatically build most of the required environment configured in the `workflow/envs/...yaml` when you activate the `--use-conda` flag. 
 
-If you decide to build everything yourself, install the following additional packages.
+However if you decide to build everything yourself, install the following additional packages.
 
 ```
 umi_tools (>=1.1.2)
@@ -22,27 +22,39 @@ sambamba (>=0.8.0)
 
 ## Usage
 
+### Preparations
+
 Once the environment is setup, prepare the data that will be analyzed. For each library, use a dedicated folder to hold the `R1` and `R2` fastq read pairs.
 
-In the `config/` directory, edit `sample_table.csv` and `config.yaml` files to fill in sample metadata. These will be used to locate your data and setup the file structure. 
+In the `config/` directory, edit `sample_table.csv` and `config.yaml` files to fill in sample metadata. These will be used by the pipeline to locate your data and setup the file structure. 
 
 Make sure to specify in `config.yaml` the correct genome index, barcode-ground-truth list and gtf annotations that will be used. Also make sure that correct file structure is constructed under the `data/` directory. 
 
-For proper file structure management, we recommend to put raw fastq files (`fastqs/`), intermediate files (`alignments/`), logs (`logs/`), and aggregated final results (`outs/`) in dedicated locations in your hardware, and construct symbolic links between your `data/` directory and the file storage systems, as shown in the project structure below.
+For proper file structure management, we recommend to put raw fastq files (`fastqs/`), intermediate files (`alignments/`), logs (`logs/`), and aggregated final results (`outs/`) in dedicated locations in your hardware, and construct symbolic links between your `data/` directory and these inputs and outputs (see repo structure below).
 
-Depending on your system specifications, you may also need to manually edit some parameters in the workflow (i.e. `pipeline.smk`). ## TODO: Update details
+Depending on your system specifications, you may also need to manually edit some parameters in the pipeline to make it work (i.e. `pipeline.smk`). ## TODO: Update details, integrate into config.yaml
 
-Activate a shell prompt, change to main directory (i.e. `ScRNAseq_smkpipe_at_Luolab/`) and execute the following command:
+### Run
+
+Once you're finished with the preparations above, you should be ready to run the pipeline. Activate a shell prompt, change to main directory (i.e. `ScRNAseq_smkpipe_at_Luolab/`) and execute the following command to start a dry run:
+
+```
+snakemake -n
+```
+
+It is highly recommended that you perform a dry run everytime before you make an actual run of the pipeline, because it can tell you if there's a bug/error/mistake in your preparation steps.
+
+If the dry run is successful, execute the following command to make an actual run:
 
 ```
 snakemake --cores XX --use-conda
 ```
 
-In `XX`, specify a number for CPU cores to be used. 
+Replace the `XX` with an integer as the number of CPU cores to be used. 
 
-Note that on the first run, it will take some time for Snakemake to setup a new environment.
+Note that the command above uses the [`Integrated Package Management`](https://snakemake.readthedocs.io/en/stable/snakefiles/deployment.html) feature of Snakemake, thus on the first run, it will take some time for Snakemake to setup a new environment.
 
-If using an environment built by yourself, use the following command instead: 
+If you prefer to use an environment built by yourself, execute the following command instead: 
 
 ```
 snakemake --cores XX
@@ -55,7 +67,7 @@ We follow a git repository structure snakemake pipelines as recommended by [snak
 ```
 ├── .gitignore
 ├── README.md
-├── LICENSE.md
+├── LICENSE
 ├── workflow
 |   ├── data
 |   |   ├── User1
