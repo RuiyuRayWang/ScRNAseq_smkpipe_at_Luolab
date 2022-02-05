@@ -24,7 +24,7 @@ sambamba (>=0.8.0)
 
 ## Example run
 
-For Example run, refer to the [Example run markdown](https://github.com/RuiyuRayWang/ScRNAseq_smkpipe_at_Luolab/blob/example/data/WangRuiyu/Example_proj/fastqs/Example_lib/Readme.md).
+For Example run, refer to the [Example run markdown](https://github.com/RuiyuRayWang/ScRNAseq_smkpipe_at_Luolab/blob/main/workflow/data/WangRuiyu/Example_proj/fastqs/Example_lib/Readme.md).
 
 ### Preparations
 
