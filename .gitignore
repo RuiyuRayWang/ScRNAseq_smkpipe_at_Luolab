@@ -10,6 +10,18 @@ config/sample_table_*.csv
 config/barcode_ground_truth_checklist*
 
 # Except the example files
+!data/WangRuiyu/Example_proj/fastqs/Example_lib/readme.txt
+!data/WangRuiyu/Example_proj/alignments/Example_lib/Example_counts.tsv.gz
+!data/WangRuiyu/Example_proj/alignments/Example_lib/Example_gene_assigned.summary
+!data/WangRuiyu/Example_proj/alignments/Example_lib/Example_Log.final.out
+!data/WangRuiyu/Example_proj/alignments/Example_lib/Example_Log.out
+!data/WangRuiyu/Example_proj/alignments/Example_lib/Example_Log.progress.out
+!data/WangRuiyu/Example_proj/alignments/Example_lib/Example_SJ.out.tab
+!data/WangRuiyu/Example_proj/alignments/Example_lib/Example_whitelist.txt
+!data/WangRuiyu/Example_proj/alignments/Example_lib/Example_whitelist_washed.txt
+!data/WangRuiyu/Example_proj/logs/Example_lib/Example_extract.log
+!data/WangRuiyu/Example_proj/logs/Example_lib/Example_whitelist.log
+!data/WangRuiyu/Example_proj/outs/Example_proj_counts_all.tsv.gz
 !config/config_example.yaml
 !config/sample_table_example.csv
 !config/barcode_ground_truth_checklist_example.csv

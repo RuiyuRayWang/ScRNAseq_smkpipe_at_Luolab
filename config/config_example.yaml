@@ -1,7 +1,7 @@
 # Project info
-user: YuFengting
-Project: Brain_scRNAseq_test
-samples: config/sample_table_BrainscRNAseqtest.csv
+user: WangRuiyu
+Project: Example_proj
+samples: config/sample_table_example.csv
 
 genome_fa: 
   - "/mnt/ZA1BT1ER/INDEX/ensembl/mus_musculus/genome/Mus_musculus.GRCm38.dna.primary_assembly.fa"
@@ -9,6 +9,6 @@ gtf_annotation: /mnt/ZA1BT1ER/INDEX/ensembl/mus_musculus/gtf/Mus_musculus.GRCm38
 genome_index: /mnt/ZA1BT1ER/INDEX/ensembl/mus_musculus/STAR_279_INDEX_GRCm38_102
 sjdbOverhang: "149"
 
-ground_truth: config/barcode_ground_truth_checklist.csv
+ground_truth: config/barcode_ground_truth_checklist_example.csv
 
 threads: 32
