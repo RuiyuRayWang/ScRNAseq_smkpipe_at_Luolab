@@ -28,7 +28,7 @@ Once the environment is setup, prepare the data that will be analyzed. For each 
 
 In the `config/` directory, edit `sample_table.csv` and `config.yaml` files to fill in sample metadata. These will be used by the pipeline to locate your data and setup the file structure. 
 
-Make sure to specify in `config.yaml` the correct genome index, barcode-ground-truth list and gtf annotations that will be used. Also make sure that correct file structure is constructed under the `data/` directory. 
+Make sure to specify in `config.yaml` the correct *genome index*, *barcode-ground-truth list* and *gtf annotations* that will be used. Also make sure that correct file structure is constructed under the `data/` directory. 
 
 For proper file structure management, we recommend to put raw fastq files (`fastqs/`), intermediate files (`alignments/`), logs (`logs/`), and aggregated final results (`outs/`) in dedicated locations in your hardware, and construct symbolic links between your `data/` directory and these inputs and outputs (see repo structure below).
 
@@ -72,11 +72,11 @@ We follow a git repository structure snakemake pipelines as recommended by [snak
 |   ├── data
 |   |   ├── User1
 |   │   │   ├── Project1
-|   │   │   │   ├── fastqs
-|   │   │   │   ├── alignments
-|   │   │   │   ├── outs
-|   │   │   │   ├── misc
-|   │   │   │   └── logs
+|   │   │   │   ├── fastqs       (symlink to raw fastq files)
+|   │   │   │   ├── alignments   (symlink to intermetiate results)
+|   │   │   │   ├── outs         (symlink to aggregated results)
+|   │   │   │   ├── miscs        (symlink to miscs)
+|   │   │   │   └── logs         (symlink to logs)
 |   │   │   └── Project2
 |   |   └── User2
 │   ├── rules
@@ -102,7 +102,7 @@ We follow a git repository structure snakemake pipelines as recommended by [snak
 
 ## Pipeline details
 
-We adopt a comprehensive pipeline described in the [umi_tools documentation](https://umi-tools.readthedocs.io/en/latest/Single_cell_tutorial.html). Some custom modification were made (i.e. multi-threading, parallel processing, STAR "shared memory" modules) for the purpose of speed boosting. There are also some minor modification on parameters for performance improvements.
+We adopt a comprehensive pipeline described in the [umi_tools documentation](https://umi-tools.readthedocs.io/en/latest/Single_cell_tutorial.html). Some custom modification were made to the original pipeline (i.e. multi-threading, parallel processing, STAR "shared memory" modules) for the purpose to boost speed. Several other minor modification were made in order to accomodate for the modified chemistry and to improve the performance of the pipeline (i.e. better alignment quality).
 
 ```
 # Step 1: Identify correct cell barcodes (umi_tools whitelist)
@@ -114,7 +114,7 @@ umi_tools whitelist --bc-pattern=CCCCCCCCNNNNNNNN \
 		    --log2stderr > whitelist.txt
 
 # Step 2: Wash whitelist
-(impletemded in scripts/wash_whitelist.py) 
+(implemented by scripts/wash_whitelist.py) 
 
 # Step 3: Extract barcodes and UMIs and add to read names
 umi_tools extract --bc-pattern=CCCCCCCCNNNNNNNN \
@@ -192,13 +192,15 @@ An abstracted workflow is illustrated in the graph below:
 1. 2022/2/1:
    To avoid misunderstanding from the users, a clarification should be made: the scRNA-seq protocol used in Luolab, for which this repo is design for, is NOT entirely the same as the standard Smartseq2 protocol described in [Picelli et al. (2013)](https://www.nature.com/articles/nmeth.2639). 
    
-   The protocol was modified in a way that resembles **a hybrid of Smartseq2 and STRTseq** ([Islam et al., 2011](https://genome.cshlp.org/content/21/7/1160)). A major difference between Smartseq2 and our method is that in standard Smartseq2, one library stands for one cell; whereas in our method, 48 cells are multiplex in a single library, and later demultiplexed by cell barcodes. One advantage of this strategy is that it can alleviate the high manual labors involved in the standard Smartseq2 protocol.
+   The protocol was modified in a way that resembles **a hybrid of Smartseq2 and STRTseq** ([Islam et al., 2011](https://genome.cshlp.org/content/21/7/1160)). A major distinction between the Smartseq2 and our method is that in the standard Smartseq2, one library stands for one cell; whereas in our method, 48 cells are multiplex in a single library, and later demultiplexed by cell barcodes. One advantage of this strategy is that it can alleviate the high manual labors involved in the standard Smartseq2 protocol.
    
-   We have modified the nomenclature used in this repo to avoid misconceptions (direct reference to Smartseq2 changed to Smartseq2/STRTseq).
+   We have modified the nomenclature used in this repo to avoid misconceptions (i.e. direct reference to Smartseq2 changed to Smartseq2/STRTseq hybrid).
 
-2. When executing the pipeline, depending on the system's hardware one may receive error: 
+2. 
+   When executing the pipeline, depending on the system's hardware, one may receive the following error: 
    > exiting because of OUTPUT FILE error: could not create output file SampleName-STARtmp//BAMsort/... SOLUTION: check that the path exists and you have write permission for this file. Also check ulimit -n and increase it to allow more open files.
 
-   This is because STAR creates lots of temporary files during running and could reach file creation limit by the system. A simple workaround is to set the `threads:` in `pipeline.smk` `rule STAR: (# Step 4-1: Map reads)` to lower values, i.e. 32->16.
+   This is because STAR creates lots of temporary files during its the run and reached the file creation limit set by the system. A simple workaround is to set the `threads:` in `pipeline.smk` `rule STAR: (# Step 4-1: Map reads)` to lower values, i.e. 32->16.
 
-3. Within a project, we recommended that you fix your STAR version. This is because genomes generated by different versions of STARs are incompatible with each other. For example, an alignment job run by STAR v2.7.9 will not accept a genome index generated by STAR v2.6.1.
+3. 
+   Within a particular project, we recommended that the user keep the STAR version unchanged and use it throughout the whole course of the project as new data comes in. This is because genomes generated by different versions of STARs are incompatible with each other. For example, an alignment job run by STAR v2.7.9 will not accept a genome index generated by STAR v2.6.1.
