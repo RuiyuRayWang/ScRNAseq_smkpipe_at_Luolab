@@ -17,7 +17,7 @@ workflow/data/WangRuiyu/Example_proj/*
 workflow/data/WangRuiyu/Example_proj/fastqs/*
 !workflow/data/WangRuiyu/Example_proj/fastqs/Example_lib
 workflow/data/WangRuiyu/Example_proj/fastqs/Example_lib/*
-!workflow/data/WangRuiyu/Example_proj/fastqs/Example_lib/Readme.md
+!workflow/data/WangRuiyu/Example_proj/fastqs/Example_lib/README.md
 ## Example config files
 !config/config_example.yaml
 !config/sample_table_example.csv

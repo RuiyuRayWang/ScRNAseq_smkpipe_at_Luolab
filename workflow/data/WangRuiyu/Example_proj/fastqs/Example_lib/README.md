@@ -15,7 +15,8 @@ ff360155afd18471e0debaa6dc98fc90  Example_R1.fq.gz
 ```
 
 ## Execute
-Execute the example run using the following command:
+
+Activate a shell prompt, change to main directory of the repo (i.e. `ScRNAseq_smkpipe_at_Luolab/`) and execute the following command to start an example run:
 
 ```
 snakemake --cores 32 --use-conda --configfile config/config_example.yaml
