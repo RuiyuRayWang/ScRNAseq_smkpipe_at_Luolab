@@ -1,13 +1,27 @@
-# Custom ignored files
+# Ignore everything matching the following custom patterns
 Log.out
 Log.progress.out
 Log.final.out
 SJ.out.tab
 .snakemake/*
 workflow/data/*
-config/sample*.csv
-config/barcode_ground_truth_checklist_1.xlsx
-config/barcode_ground_truth_checklist_2.xlsx
+config/config.*
+config/sample_table_*.csv
+config/barcode_ground_truth_checklist*
+
+# Except the example files
+## Chain of rules: 987142@stackoverflow
+!workflow/data/WangRuiyu/
+workflow/data/WangRuiyu/Example_proj/*
+!workflow/data/WangRuiyu/Example_proj/fastqs/
+workflow/data/WangRuiyu/Example_proj/fastqs/*
+!workflow/data/WangRuiyu/Example_proj/fastqs/Example_lib
+workflow/data/WangRuiyu/Example_proj/fastqs/Example_lib/*
+!workflow/data/WangRuiyu/Example_proj/fastqs/Example_lib/Readme.md
+## Example config files
+!config/config_example.yaml
+!config/sample_table_example.csv
+!config/barcode_ground_truth_checklist_example.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

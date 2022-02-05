@@ -22,6 +22,10 @@ sambamba (>=0.8.0)
 
 ## Usage
 
+## Example run
+
+For Example run, refer to the [Example run markdown](https://github.com/RuiyuRayWang/ScRNAseq_smkpipe_at_Luolab/blob/example/data/WangRuiyu/Example_proj/fastqs/Example_lib/Readme.md).
+
 ### Preparations
 
 Once the environment is setup, prepare the data that will be analyzed. For each library, use a dedicated folder to hold the `R1` and `R2` fastq read pairs.
