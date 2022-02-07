@@ -12,12 +12,12 @@ config/barcode_ground_truth_checklist*
 # Except the example files
 ## Chain of rules: 987142@stackoverflow
 !workflow/data/WangRuiyu/
-workflow/data/WangRuiyu/Example_proj/*
-!workflow/data/WangRuiyu/Example_proj/fastqs/
-workflow/data/WangRuiyu/Example_proj/fastqs/*
-!workflow/data/WangRuiyu/Example_proj/fastqs/Example_lib
-workflow/data/WangRuiyu/Example_proj/fastqs/Example_lib/*
-!workflow/data/WangRuiyu/Example_proj/fastqs/Example_lib/README.md
+workflow/data/WangRuiyu/Example/*
+!workflow/data/WangRuiyu/Example/fastqs/
+workflow/data/WangRuiyu/Example/fastqs/*
+!workflow/data/WangRuiyu/Example/fastqs/Example
+workflow/data/WangRuiyu/Example/fastqs/Example/*
+!workflow/data/WangRuiyu/Example/fastqs/Example/README.md
 ## Example config files
 !config/config_example.yaml
 !config/sample_table_example.csv

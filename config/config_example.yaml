@@ -1,7 +1,9 @@
 # Project info
 user: WangRuiyu
-Project: Example_proj
+Project: Example
 samples: config/sample_table_example.csv
+r1_extensions: ['*R1.fq.gz']
+r2_extensions: ['*R2.fq.gz']
 
 genome_fa: 
   - "/mnt/ZA1BT1ER/INDEX/ensembl/mus_musculus/genome/Mus_musculus.GRCm38.dna.primary_assembly.fa"

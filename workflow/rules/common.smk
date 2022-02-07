@@ -1,23 +1,35 @@
 import os
+import glob
 import pandas as pd
-# import glob
-
+from itertools import chain
 
 # from snakemake.utils import validate
 
 # validate(config, schema="../schemas/config.schema.yaml")
-# # Debug
+
+# ## Debug
 # import yaml
-# with open ('config/config.yaml') as f:
+# with open ('config/config_example.yaml') as f:
 #     config = yaml.safe_load(f)
 
 samples = (
-    pd.read_csv(config["samples"], dtype={'User': str, 'Project': str, 'Library': str, 'Sample': str})
-    .set_index("Sample", drop=False)
-    .sort_index()
+    pd.read_csv(config["samples"], dtype={'User': str, 'Project': str, 'Sample': str, 'Library': str, 'File_R1': str, 'File_R2': str})
+    # .set_index("Library", drop=False)
+    # .sort_index()
 )
 
-samples.Sample.fillna(samples.Library, inplace=True)
+## Parse sample table, auto-infer R1 R2 files if not specified
+fq_r1_extensions = config['r1_extensions']
+fq_r2_extensions = config['r2_extensions']
+for index, row in samples.iterrows():
+    tmp_dir = os.path.join("workflow", "data", row.User, row.Project, "fastqs", row.Library)
+    if row.File_R1 not in os.listdir(tmp_dir):
+        ## TODO: Check that globbed file number equals to 1
+        samples.at[index,'File_R1'] = os.path.basename(list(chain(*[glob.glob(os.path.join(tmp_dir, fq_r1_ext)) for fq_r1_ext in fq_r1_extensions]))[0])
+    if row.File_R2 not in os.listdir(tmp_dir):
+        samples.at[index,'File_R2'] = os.path.basename(list(chain(*[glob.glob(os.path.join(tmp_dir, fq_r2_ext)) for fq_r2_ext in fq_r2_extensions]))[0])
+
+# samples.Sample.fillna(samples.Library, inplace=True)
 
 def parse_suffix(rule):
     # Given a rule name, return the suffix of its corresponding output file
@@ -40,8 +52,8 @@ def parse_suffix(rule):
 
 def get_files(rule):
     files = expand(
-        '_'.join(["workflow/data/{user}/{project}/alignments/{library}/{sample}", parse_suffix(rule)]),
-        zip, user=samples.User.to_list(), project=samples.Project.to_list(), library=samples.Library.to_list(), sample=samples.Sample.to_list()
+        '_'.join(["workflow/data/{user}/{project}/alignments/{library}/{library}", parse_suffix(rule)]),
+        zip, user=samples.User.to_list(), project=samples.Project.to_list(), library=samples.Library.to_list()
         )
     return files
 
@@ -56,32 +68,29 @@ def parse_dynamic_output(rule):
             out_files.append(f)
     return out_files
 
+def get_fastqs(read):
+    # Get input fastq read pairs from `samples` table
+    if read=="R1":
+        files = expand(
+            "workflow/data/{user}/{project}/fastqs/{library}/{read}",
+            zip, user=samples.User.to_list(), project=samples.Project.to_list(), library=samples.Library.to_list(), read=samples.File_R1.to_list()
+            )
+    elif read=="R2":
+        files = expand(
+            "workflow/data/{user}/{project}/fastqs/{library}/{read}",
+            zip, user=samples.User.to_list(), project=samples.Project.to_list(), library=samples.Library.to_list(), read=samples.File_R2.to_list()
+            )
+    return files
+
 def parse_STAR_dummy(wc):
-    output = os.path.join("workflow", "data", wc.user, wc.project, "alignments", wc.library, wc.sample) + "_Aligned.sortedByCoord.out.bam"
-    # "workflow/data/{user}/{project}/alignments/{library}/{sample}_Aligned.sortedByCoord.out.bam"
+    output = os.path.join("workflow", "data", wc.user, wc.project, "alignments", wc.library, wc.library) + "_Aligned.sortedByCoord.out.bam"
     if os.path.exists(output):
         return ""
     else:
         return "tmp/STARload.done"
-    ## Deprecated. Failed to parse dummy independently for each sample.
-    # # all_out: list of all files supposed to be generated in a given rule
-    # # not_out: list of files not yet generated. If this is empty, return empty string (as dummy).
-    # all_out = get_files(rule)
-    # pending = [out for out in all_out if not os.path.exists(out)]
-    
-    # if rule == 'STAR':
-    #     dummy = "tmp/STARload.done"
-    # elif rule == 'featurecount':
-    #     dummy = "tmp/STARunload.done"
-
-    # if pending:
-    #     return dummy
-    # else:
-    #     # Empty list 'pending' is False
-    #     return ""
 
 def parse_fc_dummy(wc):
-    output = os.path.join("workflow", "data", wc.user, wc.project, "alignments", wc.library, wc.sample) + "_gene_assigned"
+    output = os.path.join("workflow", "data", wc.user, wc.project, "alignments", wc.library, wc.library) + "_gene_assigned"
     if os.path.exists(output):
         return ""
     else:
