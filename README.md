@@ -125,25 +125,25 @@ We adopt a comprehensive pipeline described in the [umi_tools documentation](htt
 ```
 # Step 1: Identify correct cell barcodes (umi_tools whitelist)
 umi_tools whitelist --bc-pattern=CCCCCCCCNNNNNNNN \
-		    --log=whitelist.log \
-		    --stdin=SAMPLE_R2.fq.gz \  ## R1 and R2 are swapped b.c. we customized our protocol
-		    --set-cell-number=100 \
-		    --plot-prefix=SAMPLE \
-		    --log2stderr > whitelist.txt
+		          --log=whitelist.log \
+		          --stdin=LIBRARY_R2.fq.gz \  ## R1 and R2 are swapped b.c. we customized our protocol
+		          --set-cell-number=100 \
+		          --plot-prefix=LIBRARY \
+		          --log2stderr > whitelist.txt
 
 # Step 2: Wash whitelist
 (implemented by scripts/wash_whitelist.py) 
 
 # Step 3: Extract barcodes and UMIs and add to read names
 umi_tools extract --bc-pattern=CCCCCCCCNNNNNNNN \
-		  --log=extract.log \
-		  --stdin=SAMPLE_R2.fq.gz \
-		  --read2-in=SAMPLE_R1.fq.gz \
-		  --stdout=SAMPLE_extracted.fq.gz \
-		  --read2-stdout \
-		  --filter-cell-barcode \
-		  --error-correct-cell \
-		  --whitelist=whitelist_washed.txt
+		        --log=extract.log \
+		        --stdin=LIBRARY_R2.fq.gz \
+		        --read2-in=LIBRARY_R1.fq.gz \
+		        --stdout=LIBRARY_extracted.fq.gz \
+		        --read2-stdout \
+		        --filter-cell-barcode \
+		        --error-correct-cell \
+		        --whitelist=whitelist_washed.txt
 
 # Step 4-0: Generate genome index
 STAR --runThreadN 32 \
@@ -157,7 +157,7 @@ STAR --runThreadN 32 \
 STAR --runThreadN 32 \
      --genomeLoad LoadAndKeep \
      --genomeDir /path/to/genome/index \
-     --readFilesIn SAMPLE_extracted.fq.gz \
+     --readFilesIn LIBRARY_extracted.fq.gz \
      --readFilesCommand zcat \
      --outFilterMultimapNmax 1 \
      --outFilterType BySJout \
@@ -166,7 +166,7 @@ STAR --runThreadN 32 \
      --outFilterMismatchNmax 6 \
      --outSAMtype BAM SortedByCoordinate \
      --outSAMunmapped Within \
-     --outFileNamePrefix SAMPLE_
+     --outFileNamePrefix LIBRARY_
 
 # Step 4-2: Unload STAR genome
 STAR --genomeLoad Remove \
@@ -174,28 +174,28 @@ STAR --genomeLoad Remove \
 
 # Step 5-1: Assign reads to genes
 featureCounts -s 1 \
-	      -a annotation.gtf \
-	      -o SAMPLE_gene_assigned \
-	      -R BAM SAMPLE_Aligned.sortedByCoord.out.bam \
-	      -T 32
+	         -a annotation.gtf \
+	         -o LIBRARY_gene_assigned \
+	         -R BAM LIBRARY_Aligned.sortedByCoord.out.bam \
+	         -T 32
 
 # Step 5-2: Sort and index BAM file
 sambamba sort -t 32 -m 64G \
-              -o SAMPLE_assigned_sorted.bam \
-			  SAMPLE_Aligned.sortedByCoord.out.bam.featureCounts.bam 
+              -o LIBRARY_assigned_sorted.bam \
+		    LIBRARY_Aligned.sortedByCoord.out.bam.featureCounts.bam 
 
 # Step 6: Count UMIs per gene per cell
 umi_tools count --per-gene \
-		--gene-tag=XT \
-		--per-cell \
-		--stdin=SAMPLE_assigned_sorted.bam \
-		--stdout=SAMPLE_counts.tsv.gz
+		      --gene-tag=XT \
+		      --per-cell \
+		      --stdin=LIBRARY_assigned_sorted.bam \
+		      --stdout=LIBRARY_counts.tsv.gz
 
 # Step 7: Append suffix to cells
 (implemented by scripts/append_suffix.py)
 
 # Step 8: Aggregate counts
-zcat SAMPLE1_counts.tsv.gz SAMPLE2_counts.tsv.gz ... | gzip > outs/counts_all.tsv.gz
+zcat LIBRARY1_counts.tsv.gz LIBRARY2_counts.tsv.gz ... | gzip > outs/PROJECT_counts_all.tsv.gz
 ```
 
 An abstracted workflow is illustrated in the graph below:
