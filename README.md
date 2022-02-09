@@ -36,7 +36,7 @@ git clone https://github.com/RuiyuRayWang/ScRNAseq_smkpipe_at_Luolab.git
 
 We recommend that the first-time user always perform an example run before proceeding to subsequent steps. The example run serves as a check to the setup of the pipline. If the example runs smoothly, you know that the pipeline is set up properly.
 
-For Example run, refer to the [Example run markdown](https://github.com/RuiyuRayWang/ScRNAseq_smkpipe_at_Luolab/blob/main/workflow/data/WangRuiyu/Example_proj/fastqs/Example_lib/Readme.md).
+For Example run, refer to the [Example run markdown](https://github.com/RuiyuRayWang/ScRNAseq_smkpipe_at_Luolab/blob/main/workflow/data/WangRuiyu/Example/README.md).
 
 ### Preparations
 
