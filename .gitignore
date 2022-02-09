@@ -13,11 +13,15 @@ config/barcode_ground_truth_checklist*
 ## Chain of rules: 987142@stackoverflow
 !workflow/data/WangRuiyu/
 workflow/data/WangRuiyu/Example/*
+!workflow/data/WangRuiyu/Example/README.md
 !workflow/data/WangRuiyu/Example/fastqs/
 workflow/data/WangRuiyu/Example/fastqs/*
-!workflow/data/WangRuiyu/Example/fastqs/Example
-workflow/data/WangRuiyu/Example/fastqs/Example/*
-!workflow/data/WangRuiyu/Example/fastqs/Example/README.md
+!workflow/data/WangRuiyu/Example/fastqs/Testdata1
+!workflow/data/WangRuiyu/Example/fastqs/Testdata2
+workflow/data/WangRuiyu/Example/fastqs/Testdata1/*
+workflow/data/WangRuiyu/Example/fastqs/Testdata2/*
+!workflow/data/WangRuiyu/Example/fastqs/Testdata2/MD5.txt
+!workflow/data/WangRuiyu/Example/fastqs/Testdata1/MD5.txt
 ## Example config files
 !config/config_example.yaml
 !config/sample_table_example.csv
