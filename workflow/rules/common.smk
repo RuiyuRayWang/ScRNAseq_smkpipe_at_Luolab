@@ -14,8 +14,8 @@ from itertools import chain
 
 samples = (
     pd.read_csv(config["samples"], dtype={'User': str, 'Project': str, 'Sample': str, 'Library': str, 'File_R1': str, 'File_R2': str})
-    # .set_index("Library", drop=False)
-    # .sort_index()
+    .set_index("Library", drop=False)
+    .sort_index()
 )
 
 ## Parse sample table, auto-infer R1 R2 files if not specified
@@ -68,19 +68,11 @@ def parse_dynamic_output(rule):
             out_files.append(f)
     return out_files
 
-def get_fastqs(read):
+def get_fastqs(wc):
     # Get input fastq read pairs from `samples` table
-    if read=="R1":
-        files = expand(
-            "workflow/data/{user}/{project}/fastqs/{library}/{read}",
-            zip, user=samples.User.to_list(), project=samples.Project.to_list(), library=samples.Library.to_list(), read=samples.File_R1.to_list()
-            )
-    elif read=="R2":
-        files = expand(
-            "workflow/data/{user}/{project}/fastqs/{library}/{read}",
-            zip, user=samples.User.to_list(), project=samples.Project.to_list(), library=samples.Library.to_list(), read=samples.File_R2.to_list()
-            )
-    return files
+    u = samples.loc[wc.library, ["User","Project","Sample","Library","File_R1","File_R2"]].dropna()
+    return {"read1": f"workflow/data/{u.User}/{u.Project}/fastqs/{u.Library}/{u.File_R2}", 
+            "read2": f"workflow/data/{u.User}/{u.Project}/fastqs/{u.Library}/{u.File_R1}"}
 
 def parse_STAR_dummy(wc):
     output = os.path.join("workflow", "data", wc.user, wc.project, "alignments", wc.library, wc.library) + "_Aligned.sortedByCoord.out.bam"
