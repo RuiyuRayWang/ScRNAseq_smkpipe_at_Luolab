@@ -5,7 +5,7 @@
 # Step 1: Identify cell barcode whitelist (identify correct BC)
 rule umi_tools_whitelist:
     input:
-        read1=get_fastqs("R2")
+        unpack(get_fastqs),
     output:
         "workflow/data/{user}/{project}/alignments/{library}/{library}_whitelist.txt"
     log:
@@ -39,8 +39,7 @@ rule wash_whitelist:
 # Step 3: Extract barcodes and UMIs and add to read names
 rule umi_tools_extract:
     input:
-        read1=get_fastqs("R2"),
-        read2=get_fastqs("R1"),
+        unpack(get_fastqs),
         whitelist_washed="workflow/data/{user}/{project}/alignments/{library}/{library}_whitelist_washed.txt"
     output:
         "workflow/data/{user}/{project}/alignments/{library}/{library}_extracted.fq.gz"
