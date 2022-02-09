@@ -18,10 +18,10 @@ rule umi_tools_whitelist:
         """
         umi_tools whitelist --bc-pattern=CCCCCCCCNNNNNNNN \
                             --log={log} \
-                            --stdin {input.read1} \
                             --set-cell-number=100 \
                             --plot-prefix=workflow/data/{wildcards.user}/{wildcards.project}/alignments/{wildcards.library}/{wildcards.library} \
-                            --log2stderr > {output}
+                            --stdin={input.read1} \
+                            --stdout={output}
         """
 
 # Step 2: Wash whitelist
@@ -53,9 +53,9 @@ rule umi_tools_extract:
         """
         umi_tools extract --bc-pattern=CCCCCCCCNNNNNNNN \
                           --log={log} \
-                          --stdin {input.read1} \
-                          --read2-in {input.read2} \
-                          --stdout {output} \
+                          --stdin={input.read1} \
+                          --read2-in={input.read2} \
+                          --stdout={output} \
                           --read2-stdout \
                           --filter-cell-barcode \
                           --error-correct-cell \
@@ -198,6 +198,8 @@ rule umi_tools_count:
         "workflow/data/{user}/{project}/alignments/{library}/{library}_assigned_sorted.bam"
     output:
         temp("workflow/data/{user}/{project}/alignments/{library}/{library}_counts_raw.tsv.gz")
+    log:
+        "workflow/data/{user}/{project}/logs/{library}/{library}_count.log"
     conda:
         "../envs/master.yaml"
     threads:
@@ -205,10 +207,11 @@ rule umi_tools_count:
     shell:
         """
         umi_tools count --per-gene \
-                        --gene-tag=XT \
                         --per-cell \
+                        --gene-tag=XT \
+                        --log={log} \
                         --stdin={input} \
-                        --stdout={output}
+                        --stdout={output} \
         """
 
 # Step 7: Append suffix to cells

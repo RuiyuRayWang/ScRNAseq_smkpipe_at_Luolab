@@ -125,11 +125,11 @@ We adopt a comprehensive pipeline described in the [umi_tools documentation](htt
 ```
 # Step 1: Identify correct cell barcodes (umi_tools whitelist)
 umi_tools whitelist --bc-pattern=CCCCCCCCNNNNNNNN \
-		          --log=whitelist.log \
-		          --stdin=LIBRARY_R2.fq.gz \  ## R1 and R2 are swapped b.c. we customized our protocol
+		          --log=LIBRARY_whitelist.log \
 		          --set-cell-number=100 \
 		          --plot-prefix=LIBRARY \
-		          --log2stderr > whitelist.txt
+		          --stdin=LIBRARY_R2.fq.gz \  ## R1 and R2 are swapped b.c. we customized our protocol
+		          --stdout=LIBRARY_whitelist.txt
 
 # Step 2: Wash whitelist
 (implemented by scripts/wash_whitelist.py) 
@@ -186,8 +186,9 @@ sambamba sort -t 32 -m 64G \
 
 # Step 6: Count UMIs per gene per cell
 umi_tools count --per-gene \
-		      --gene-tag=XT \
 		      --per-cell \
+		      --gene-tag=XT \
+                --log={log} \
 		      --stdin=LIBRARY_assigned_sorted.bam \
 		      --stdout=LIBRARY_counts.tsv.gz
 
