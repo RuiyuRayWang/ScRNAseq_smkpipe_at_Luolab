@@ -151,7 +151,6 @@ rule STAR_unload:
         STAR --genomeLoad Remove \
              --genomeDir {input.genomeDir} \
              --outSAMmode None
-        rm Log.final.out Log.out Log.progress.out SJ.out.tab
         """
 
 ## TODO: STAR mapping summarize statistics
@@ -242,3 +241,9 @@ rule aggr_counts:
         """
         zcat {input} | sed '2, ${{/gene/d;}}' | gzip > {output}
         """
+
+onsuccess:
+    shell("rm -f Log.final.out Log.out Log.progress.out SJ.out.tab")
+
+onerror:
+    shell("STAR --genomeLoad Remove --genomeDir {config[genome_index]} --outSAMmode None; rm -f Log.final.out Log.out Log.progress.out SJ.out.tab")
