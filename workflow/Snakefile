@@ -1,4 +1,5 @@
 configfile: "config/config.yaml"
+report: "report/workflow.rst"
 
 include: "rules/common.smk"
 include: "rules/pipeline.smk"

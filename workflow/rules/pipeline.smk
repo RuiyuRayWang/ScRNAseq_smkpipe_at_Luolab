@@ -7,7 +7,8 @@ rule umi_tools_whitelist:
     input:
         unpack(get_fastqs),
     output:
-        "workflow/data/{user}/{project}/alignments/{library}/{library}_whitelist.txt"
+        "workflow/data/{user}/{project}/alignments/{library}/{library}_whitelist.txt",
+        report("workflow/data/{user}/{project}/alignments/{library}/{library}_cell_barcode_counts.png", caption="../report/umi_tools_whitelist.rst", category="umi_tools")
     log:
         "workflow/data/{user}/{project}/logs/{library}/{library}_whitelist.log"
     conda:
@@ -111,7 +112,8 @@ rule STAR:
         dummy="tmp/STARload.done"
         # dummy=parse_STAR_dummy,
     output:
-        "workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam"
+        bam="workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam",
+        lf=report("workflow/data/{user}/{project}/alignments/{library}/{library}_Log.final.out", caption="../report/STAR.rst", category="STAR")
     conda:
         "../envs/master.yaml"
     threads:
@@ -155,7 +157,7 @@ rule STAR_unload:
 ## TODO: STAR mapping summarize statistics
 
 # Step 5-1: Assign reads to genes (featureCount)
-rule featurecount:
+rule featureCounts:
     input:
         gtf=config["gtf_annotation"],
         bam="workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam",
@@ -163,6 +165,7 @@ rule featurecount:
         # dummy=parse_fc_dummy,
     output:
         assigned="workflow/data/{user}/{project}/alignments/{library}/{library}_gene_assigned",
+        summary=report("workflow/data/{user}/{project}/alignments/{library}/{library}_gene_assigned.summary", caption="../report/featureCounts.rst", category="featureCounts"),
         bam_counted=temp("workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam.featureCounts.bam")
     conda:
         "../envs/master.yaml"

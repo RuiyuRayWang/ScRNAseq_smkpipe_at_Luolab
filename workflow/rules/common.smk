@@ -41,7 +41,7 @@ def parse_suffix(rule):
         return 'extracted.fq.gz'
     elif rule == 'STAR':
         return 'Aligned.sortedByCoord.out.bam'
-    elif rule == 'featurecount':
+    elif rule == 'featureCounts':
         return 'Aligned.sortedByCoord.out.bam.featureCounts.bam'
     elif rule == 'sambamba_sort':
         return 'assigned_sorted.bam'
@@ -49,6 +49,12 @@ def parse_suffix(rule):
         return 'counts_raw.tsv.gz'
     elif rule == "append_sfx":
         return 'counts.tsv.gz'
+    elif rule == "umi_tools_whitelist_report":
+        return 'cell_barcode_counts.png'
+    elif rule == "featureCounts_report":
+        return 'gene_assigned.summary'
+    elif rule == "STAR_report":
+        return 'Log.final.out'
 
 def get_files(rule):
     files = expand(
