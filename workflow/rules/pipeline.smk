@@ -42,7 +42,7 @@ rule umi_tools_extract:
         unpack(get_fastqs),
         whitelist_washed="workflow/data/{user}/{project}/alignments/{library}/{library}_whitelist_washed.txt"
     output:
-        "workflow/data/{user}/{project}/alignments/{library}/{library}_extracted.fq.gz"
+        "workflow/data/{user}/{project}/alignments/{library}/{library}_extracted.fq.gz",
     log:
         "workflow/data/{user}/{project}/logs/{library}/{library}_extract.log"
     conda:
@@ -108,7 +108,8 @@ rule STAR:
     input:
         extracted_fq="workflow/data/{user}/{project}/alignments/{library}/{library}_extracted.fq.gz",
         genomeDir=config["genome_index"],
-        dummy=parse_STAR_dummy,
+        dummy="tmp/STARload.done"
+        # dummy=parse_STAR_dummy,
     output:
         "workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam"
     conda:
@@ -158,7 +159,8 @@ rule featurecount:
     input:
         gtf=config["gtf_annotation"],
         bam="workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam",
-        dummy=parse_fc_dummy,
+        dummy="tmp/STARunload.done"
+        # dummy=parse_fc_dummy,
     output:
         assigned="workflow/data/{user}/{project}/alignments/{library}/{library}_gene_assigned",
         bam_counted=temp("workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam.featureCounts.bam")
