@@ -109,8 +109,8 @@ rule STAR:
     input:
         extracted_fq="workflow/data/{user}/{project}/alignments/{library}/{library}_extracted.fq.gz",
         genomeDir=config["genome_index"],
-        dummy="tmp/STARload.done"
-        # dummy=parse_STAR_dummy,
+        # dummy="tmp/STARload.done"
+        dummy=parse_STAR_dummy,
     output:
         bam="workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam",
         lf=report("workflow/data/{user}/{project}/alignments/{library}/{library}_Log.final.out", caption="../report/STAR.rst", category="STAR")
@@ -161,8 +161,8 @@ rule featureCounts:
     input:
         gtf=config["gtf_annotation"],
         bam="workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam",
-        dummy="tmp/STARunload.done"
-        # dummy=parse_fc_dummy,
+        # dummy="tmp/STARunload.done"
+        dummy=parse_fc_dummy,
     output:
         assigned="workflow/data/{user}/{project}/alignments/{library}/{library}_gene_assigned",
         summary=report("workflow/data/{user}/{project}/alignments/{library}/{library}_gene_assigned.summary", caption="../report/featureCounts.rst", category="featureCounts"),
