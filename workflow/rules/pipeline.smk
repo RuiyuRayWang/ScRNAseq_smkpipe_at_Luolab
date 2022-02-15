@@ -242,6 +242,20 @@ rule aggr_counts:
         zcat {input} | sed '2, ${{/gene/d;}}' | gzip > {output}
         """
 
+# Step 9: QC report
+rule qc_report:
+    input:
+        whitelist_log=get_files("whitelist_log"),
+        extract_log=get_files("extract_log"),
+        count_log=get_files("count_log")
+    output:
+        stats_table="workflow/data/{user}/{project}/outs/{project}_stats.csv",
+        
+    threads:
+        1
+    script:
+        "../scripts/parse_qc_stats.py"
+
 onsuccess:
     shell("rm -f Log.final.out Log.out Log.progress.out SJ.out.tab")
 

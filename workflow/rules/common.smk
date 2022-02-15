@@ -55,6 +55,12 @@ def parse_suffix(rule):
         return 'gene_assigned.summary'
     elif rule == "STAR_report":
         return 'Log.final.out'
+    elif rule == "whitelist_log":
+        return 'whitelist.log'
+    elif rule == "extract_log":
+        return 'extract.log'
+    elif rule == "count_log":
+        return 'count.log'
 
 def get_files(rule):
     files = expand(
