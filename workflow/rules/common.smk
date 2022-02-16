@@ -32,7 +32,8 @@ for index, row in samples.iterrows():
 # samples.Sample.fillna(samples.Library, inplace=True)
 
 def parse_suffix(rule):
-    # Given a rule name, return the suffix of its corresponding output file
+    ## Given a rule name, return the suffix of its corresponding output file
+    ## rule should be renamed, consider it later.
     if rule == 'umi_tools_whitelist':
         return 'whitelist.txt'
     elif rule == 'wash_whitelist':
@@ -65,6 +66,13 @@ def parse_suffix(rule):
 def get_files(rule):
     files = expand(
         '_'.join(["workflow/data/{user}/{project}/alignments/{library}/{library}", parse_suffix(rule)]),
+        zip, user=samples.User.to_list(), project=samples.Project.to_list(), library=samples.Library.to_list()
+        )
+    return files
+
+def get_logfile(rule):
+    files = expand(
+        '_'.join(["workflow/data/{user}/{project}/logs/{library}/{library}", parse_suffix(rule)]),
         zip, user=samples.User.to_list(), project=samples.Project.to_list(), library=samples.Library.to_list()
         )
     return files

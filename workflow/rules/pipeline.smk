@@ -245,12 +245,11 @@ rule aggr_counts:
 # Step 9: QC report
 rule qc_report:
     input:
-        whitelist_log=get_files("whitelist_log"),
-        extract_log=get_files("extract_log"),
-        count_log=get_files("count_log")
+        whitelist_log=get_logfile("whitelist_log"),
+        extract_log=get_logfile("extract_log"),
+        count_log=get_logfile("count_log")
     output:
-        stats_table="workflow/data/{user}/{project}/outs/{project}_stats.csv",
-        
+        stats_table=touch("workflow/data/{user}/{project}/outs/{project}_stats.csv"),
     threads:
         1
     script:

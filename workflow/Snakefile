@@ -7,5 +7,6 @@ include: "rules/pipeline.smk"
 rule all:
     input:
     # Final outputs
+        "workflow/data/WangRuiyu/Example/outs/Example_stats.csv",
         parse_dynamic_output('append_sfx'),
         get_aggr_output()
