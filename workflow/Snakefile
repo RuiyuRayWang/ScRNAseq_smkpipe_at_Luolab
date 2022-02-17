@@ -9,4 +9,5 @@ rule all:
     # Final outputs
         "workflow/data/WangRuiyu/Example/outs/Example_stats.csv",
         parse_dynamic_output('append_sfx'),
+        get_report_output(),
         get_aggr_output()

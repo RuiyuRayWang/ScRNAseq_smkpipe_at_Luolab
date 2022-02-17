@@ -245,11 +245,11 @@ rule aggr_counts:
 # Step 9: QC report
 rule qc_report:
     input:
-        whitelist_log=get_logfile("whitelist_log"),
-        extract_log=get_logfile("extract_log"),
-        count_log=get_logfile("count_log")
+        log_whitelist=get_logfiles("log_whitelist"),
+        log_extract=get_logfiles("log_extract"),
+        log_count=get_logfiles("log_count")
     output:
-        stats_table=touch("workflow/data/{user}/{project}/outs/{project}_stats.csv"),
+        df_stats=report("workflow/data/{user}/{project}/outs/{project}_stats.csv", caption="Stats parsed from logfiles", category="Aggregated Stats"),
     threads:
         1
     script:
@@ -258,5 +258,12 @@ rule qc_report:
 onsuccess:
     shell("rm -f Log.final.out Log.out Log.progress.out SJ.out.tab")
 
-onerror:
-    shell("STAR --genomeLoad Remove --genomeDir {config[genome_index]} --outSAMmode None; rm -f Log.final.out Log.out Log.progress.out SJ.out.tab")
+# onerror:
+#     ## BUG: STAR "onerror" is called outside conda env, using `conda:` causes syntax error
+#     conda:
+#         "../envs/master.yaml"
+#     shell:
+#         """
+#         STAR --genomeLoad Remove --genomeDir {config[genome_index]} --outSAMmode None
+#         rm -f Log.final.out Log.out Log.progress.out SJ.out.tab")
+#         """

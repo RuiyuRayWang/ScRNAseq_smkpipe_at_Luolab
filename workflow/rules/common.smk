@@ -56,11 +56,11 @@ def parse_suffix(rule):
         return 'gene_assigned.summary'
     elif rule == "STAR_report":
         return 'Log.final.out'
-    elif rule == "whitelist_log":
+    elif rule == "log_whitelist":
         return 'whitelist.log'
-    elif rule == "extract_log":
+    elif rule == "log_extract":
         return 'extract.log'
-    elif rule == "count_log":
+    elif rule == "log_count":
         return 'count.log'
 
 def get_files(rule):
@@ -70,7 +70,7 @@ def get_files(rule):
         )
     return files
 
-def get_logfile(rule):
+def get_logfiles(rule):
     files = expand(
         '_'.join(["workflow/data/{user}/{project}/logs/{library}/{library}", parse_suffix(rule)]),
         zip, user=samples.User.to_list(), project=samples.Project.to_list(), library=samples.Library.to_list()
@@ -107,6 +107,10 @@ def parse_fc_dummy(wc):
         return ""
     else:
         return "tmp/STARunload.done"
+
+def get_report_output():
+    return list(set(expand("workflow/data/{user}/{project}/outs/{project}_stats.csv", 
+    zip, user=samples.User.to_list(), project=samples.Project.to_list())))
 
 def get_aggr_output():
     return list(set(expand("workflow/data/{user}/{project}/outs/{project}_counts_all.tsv.gz", 
