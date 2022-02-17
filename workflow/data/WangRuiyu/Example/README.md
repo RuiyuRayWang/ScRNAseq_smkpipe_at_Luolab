@@ -10,7 +10,7 @@ We provide two libraries as an example dataset, each contains two fastq files in
 You should find an MD5 checksum file, in the text format (i.e. MD5.txt), located in each of the library folder.
 
 After the download is finished, md5sum's of the example dataset can be checked against the following records.  
-You can find the same in the `fastqs/Testdata*/MD5.txt` files in this repo:
+You can find the same md5sums in the `fastqs/Testdata*/MD5.txt` files in this repo:
 
 ```
 # Testdata1
