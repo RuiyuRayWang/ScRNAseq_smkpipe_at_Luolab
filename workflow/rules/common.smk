@@ -109,8 +109,8 @@ def parse_fc_dummy(wc):
         return "tmp/STARunload.done"
 
 def get_report_output():
-    return list(set(expand("workflow/data/{user}/{project}/outs/{project}_stats.csv", 
-    zip, user=samples.User.to_list(), project=samples.Project.to_list())))
+    return list(set(expand("workflow/data/{user}/{project}/outs/{project}_{suffix}", 
+    zip, user=samples.User.to_list(), project=samples.Project.to_list(), suffix=['stats.csv','reads_stats.svg'])))
 
 def get_aggr_output():
     return list(set(expand("workflow/data/{user}/{project}/outs/{project}_counts_all.tsv.gz", 

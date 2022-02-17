@@ -1,6 +1,7 @@
 import re
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
 # import time
 
@@ -103,18 +104,7 @@ for rule in rules:
             stats[rule].append(parse_logfiles(lf, rule))
     elif rule == 'count':
         for lf in snakemake.input.log_count:
-            stats[rule].append(parse_logfiles(lf, rule))
-
-for rule in rules:
-    if rule == 'whitelist':
-        for lf in log_whitelist:
-            stats[rule].append(parse_logfiles(lf, rule))
-    elif rule == 'extract':
-        for lf in log_extract:
-            stats[rule].append(parse_logfiles(lf, rule))
-    elif rule == 'count':
-        for lf in log_count:
-            stats[rule].append(parse_logfiles(lf, rule))            
+            stats[rule].append(parse_logfiles(lf, rule))         
 
 ## Parse stats from dictionary to dataframe
 df_whitelist = pd.DataFrame(stats['whitelist'])
@@ -123,6 +113,7 @@ df_count = pd.DataFrame(stats['count'])
 
 df_stats = pd.merge(pd.merge(df_whitelist, df_extract, how="left", on="Library"), df_count, how="left", on="Library").set_index('Library')
 df_stats["n_reads_washed"] = df_stats["n_reads_selected"] - df_stats["n_reads_valid_BC_UMI"]
+df_stats["n_reads_filtered"] = df_stats["n_reads_uncorrectable"] - df_stats["n_reads_washed"]  ## Filtered becaused not selected
 df_stats["n_reads_ununimapped"] = df_stats["n_reads_valid_BC_UMI"] - df_stats["n_reads_unimapped_valid"]  ## Multimapping + Unmapped too short + Unmapped other
 df_stats["n_reads_effective"] = df_stats["n_reads_unimapped_valid"] - df_stats["n_reads_skipped"]
 df_stats["n_reads_collapsed"] = df_stats["n_reads_effective"] - df_stats["n_reads_deduped"]
@@ -130,11 +121,74 @@ df_stats["alignment_rate"] = df_stats["n_reads_unimapped_valid"] / df_stats["n_r
 df_stats["seq_saturation"] = 1 - df_stats["n_reads_deduped"] / df_stats["n_reads_effective"]
 df_stats.to_csv(snakemake.output[0], index=True, sep=",", header=True)
 
+## Plots
+### Reads perspective
+df_plot = df_stats[["n_reads_deduped","n_reads_collapsed","n_reads_skipped","n_reads_ununimapped","n_reads_uncorrectable"]]
+labs = ["Final Reads", "Deduplicated Reads", "Reads Not Assigned to Feature", "Not Unique Mapped Reads", "Non-correctable Reads"]
+colors = sns.color_palette("Set2", 5)
+
+fig, ax = plt.subplots()
+
+left = np.zeros(len(df_plot))
+
+for i, col in enumerate(df_plot.columns):
+    ax.barh(
+        df_plot.index, df_plot[col], left=left, label=labs[i], height=0.36, edgecolor="#000000", color=colors[i])
+    left += np.array(df_plot[col])
+
+totals = df_plot.sum(axis=1)
+for i, total in enumerate(totals):
+    ax.text(total, totals.index[i], round(total), va='center',
+            weight='bold', rotation=270)
+
+x_offset = - max(totals) * 0.03
+for bar in ax.patches:
+    ax.text(
+        bar.get_width() + bar.get_x() + x_offset,
+        bar.get_y() + bar.get_height() / 2,
+        round(bar.get_width()),
+        va='center',
+        color='w',
+        weight='bold',
+        size=8,
+        rotation=270
+    )
+
+ax.set_title('QC Statistics: Reads Perspective')
+ax.set_xlabel('# Reads')
+ax.set_ylabel('Library')
+
+box = ax.get_position()
+ax.set_position([box.x0, box.y0 + box.height * 0.1,
+                 box.width, box.height * 0.9])
+
+ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15),
+          fancybox=True, shadow=True, ncol=2)
+
+# fig.tight_layout()
+# fig.show()
+fig.savefig(snakemake.output[1], dpi=150, bbox_inches="tight")
+
+
+# =================== DEBUG ===================
+
+## For debug purposes
+# log_whitelist = ['workflow/data/WangRuiyu/Example/logs/Testdata1/Testdata1_whitelist.log', 'workflow/data/WangRuiyu/Example/logs/Testdata2/Testdata2_whitelist.log']
+# log_extract = ['workflow/data/WangRuiyu/Example/logs/Testdata1/Testdata1_extract.log', 'workflow/data/WangRuiyu/Example/logs/Testdata2/Testdata2_extract.log']
+# log_count = ['workflow/data/WangRuiyu/Example/logs/Testdata1/Testdata1_count.log', 'workflow/data/WangRuiyu/Example/logs/Testdata2/Testdata2_count.log']
+
+# for rule in rules:
+#     if rule == 'whitelist':
+#         for lf in log_whitelist:
+#             stats[rule].append(parse_logfiles(lf, rule))
+#     elif rule == 'extract':
+#         for lf in log_extract:
+#             stats[rule].append(parse_logfiles(lf, rule))
+#     elif rule == 'count':
+#         for lf in log_count:
+#             stats[rule].append(parse_logfiles(lf, rule))   
 
 # ================ DEPREACATED ================
-
-## For debug
-
 
 # ## Strategy [2]
 # ## Slower than iter_log_getstat, marked as deprecated.
@@ -167,6 +221,46 @@ df_stats.to_csv(snakemake.output[0], index=True, sep=",", header=True)
 #     "count":    ["n_reads_unimapped_valid","n_reads_skipped","n_reads_deduped"]
 #     }
 
-
 ## runtime test for strategy [1]
 # t=time.time();iter_log_getstat(logfile, rule="whitelist", stat="n_reads_total");iter_log_getstat(logfile, rule="whitelist", stat="n_BCs_unique");iter_log_getstat(logfile, rule="whitelist", stat="n_reads_selected");iter_log_getstat(logfile, rule="whitelist", stat="n_reads_correctable");print(time.time()-t)
+
+## Plot test
+# ax = df_stats[["n_reads_deduped","n_reads_collapsed","n_reads_skipped","n_reads_ununimapped","n_reads_uncorrectable"]].plot.barh(stacked=True)
+# plt.show()
+
+## Plot horizontal
+# df_test = df_stats[["n_reads_deduped","n_reads_collapsed"]]
+
+# fig, ax = plt.subplots()
+
+# colors = ['#24b1d1', '#ae24d1']
+# bottom = np.zeros(len(df_test))
+
+# for i, col in enumerate(df_test.columns):
+#     ax.bar(
+#         df_test.index, df_test[col], bottom=bottom, label=col, color=colors[i])
+#     bottom += np.array(df_test[col])
+
+# totals = df_test.sum(axis=1)
+# y_offset = 10000
+# for i, total in enumerate(totals):
+#     ax.text(totals.index[i], total + y_offset, round(total), ha='center',
+#             weight='bold')
+
+# y_offset = -25000
+# for bar in ax.patches:
+#     ax.text(
+#         bar.get_x() + bar.get_width() / 2,
+#         bar.get_height() + bar.get_y() + y_offset,
+#         round(bar.get_height()),
+#         ha='center',
+#         color='w',
+#         weight='bold',
+#         size=8
+#     )
+
+# ax.set_title('Tips by Day and Gender')
+# ax.legend()
+# plt.show()
+
+# fig.savefig("/home/luolab/GITHUB_REPO/test.png", dpi=150, bbox_inches="tight")
