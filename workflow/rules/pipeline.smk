@@ -260,7 +260,7 @@ onsuccess:
     shell("rm -f Log.final.out Log.out Log.progress.out SJ.out.tab")
 
 # onerror:
-#     ## BUG: STAR "onerror" is called outside conda env, using `conda:` causes syntax error
+#     ## BUG: STAR "onerror" is called outside conda env, version doesn't match. Using `conda:` causes syntax error
 #     conda:
 #         "../envs/master.yaml"
 #     shell:

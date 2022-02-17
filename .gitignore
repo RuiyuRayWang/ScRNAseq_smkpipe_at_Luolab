@@ -3,6 +3,7 @@ Log.out
 Log.progress.out
 Log.final.out
 SJ.out.tab
+report.html
 .snakemake/*
 workflow/data/*
 config/config.*
