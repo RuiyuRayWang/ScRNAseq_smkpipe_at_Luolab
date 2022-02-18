@@ -251,6 +251,8 @@ rule qc_report:
     output:
         df_stats=report("workflow/data/{user}/{project}/outs/{project}_stats.csv", category="Aggregated Stats"),
         reads_fig=report("workflow/data/{user}/{project}/outs/{project}_reads_stats.svg", category="Aggregated Stats"),
+    conda:
+        "../envs/master.yaml"
     threads:
         1
     script:
