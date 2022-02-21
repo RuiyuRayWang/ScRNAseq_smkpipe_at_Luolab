@@ -251,7 +251,7 @@ rule qc_report:
     output:
         df_stats=report("workflow/data/{user}/{project}/outs/{project}_stats.csv", caption="../report/stats_table.rst", category="Aggregated Stats"),
         reads_pdf=report("workflow/data/{user}/{project}/outs/{project}_reads_stats.pdf", caption="../report/reads_stats.rst", category="Aggregated Stats"),
-        reads_html="workflow/data/{user}/{project}/outs/{project}_reads_stats.html", category="Aggregated Stats"
+        reads_html="workflow/data/{user}/{project}/outs/{project}_reads_stats.html",
     conda:
         "../envs/master.yaml"
     threads:
