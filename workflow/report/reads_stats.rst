@@ -1,0 +1,1 @@
+Bar chart of Reads Statistics. For interactive chart, check out `outs/..._reads_stats.html`.

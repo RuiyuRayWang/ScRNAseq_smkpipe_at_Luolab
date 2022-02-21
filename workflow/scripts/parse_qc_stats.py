@@ -195,6 +195,7 @@ bars = alt.Chart(df_plot).mark_bar().encode(
 )
 
 bars.save(snakemake.output[1])
+bars.save(snakemake.output[2])
 
 # =================== DEBUG ===================
 

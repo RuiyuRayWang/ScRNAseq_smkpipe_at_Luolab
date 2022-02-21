@@ -249,8 +249,9 @@ rule qc_report:
         log_extract=get_logfiles("log_extract"),
         log_count=get_logfiles("log_count")
     output:
-        df_stats=report("workflow/data/{user}/{project}/outs/{project}_stats.csv", category="Aggregated Stats"),
-        reads_html=report("workflow/data/{user}/{project}/outs/{project}_reads_stats.html", category="Aggregated Stats"),
+        df_stats=report("workflow/data/{user}/{project}/outs/{project}_stats.csv", caption="../report/stats_table.rst", category="Aggregated Stats"),
+        reads_pdf=report("workflow/data/{user}/{project}/outs/{project}_reads_stats.pdf", caption="../report/reads_stats.rst", category="Aggregated Stats"),
+        reads_html="workflow/data/{user}/{project}/outs/{project}_reads_stats.html", category="Aggregated Stats"
     conda:
         "../envs/master.yaml"
     threads:

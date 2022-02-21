@@ -110,7 +110,7 @@ def parse_fc_dummy(wc):
 
 def get_report_output():
     return list(set(expand("workflow/data/{user}/{project}/outs/{project}_{suffix}", 
-    zip, user=samples.User.to_list(), project=samples.Project.to_list(), suffix=['stats.csv','reads_stats.html'])))
+    zip, user=samples.User.to_list(), project=samples.Project.to_list(), suffix=['stats.csv','reads_stats.pdf','reads_stats.html'])))
 
 def get_aggr_output():
     return list(set(expand("workflow/data/{user}/{project}/outs/{project}_counts_all.tsv.gz", 
