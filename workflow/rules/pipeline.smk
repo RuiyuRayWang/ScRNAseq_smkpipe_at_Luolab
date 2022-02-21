@@ -250,7 +250,7 @@ rule qc_report:
         log_count=get_logfiles("log_count")
     output:
         df_stats=report("workflow/data/{user}/{project}/outs/{project}_stats.csv", category="Aggregated Stats"),
-        reads_fig=report("workflow/data/{user}/{project}/outs/{project}_reads_stats.svg", category="Aggregated Stats"),
+        reads_html=report("workflow/data/{user}/{project}/outs/{project}_reads_stats.html", category="Aggregated Stats"),
     conda:
         "../envs/master.yaml"
     threads:

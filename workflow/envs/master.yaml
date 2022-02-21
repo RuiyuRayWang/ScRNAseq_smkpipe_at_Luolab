@@ -6,4 +6,4 @@ dependencies:
   - star=2.7.9
   - sambamba=0.8.0
   - subread=1.6.3
-  - seaborn=0.11.2
+  - altair=4.2.0
