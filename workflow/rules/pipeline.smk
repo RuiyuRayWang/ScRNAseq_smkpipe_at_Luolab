@@ -260,14 +260,13 @@ rule qc_report:
         "../scripts/parse_qc_stats.py"
 
 onsuccess:
-    shell("rm -f Log.final.out Log.out Log.progress.out SJ.out.tab")
+    shell("rm -f Log.final.out Log.out Log.progress.out SJ.out.tab geckodriver.log")
 
-# onerror:
-#     ## BUG: STAR "onerror" is called outside conda env, version doesn't match. Using `conda:` causes syntax error
-#     conda:
-#         "../envs/master.yaml"
-#     shell:
-#         """
-#         STAR --genomeLoad Remove --genomeDir {config[genome_index]} --outSAMmode None
-#         rm -f Log.final.out Log.out Log.progress.out SJ.out.tab")
-#         """
+onerror:
+    ## TODO: Get conda env through parser
+    shell(
+        "rm -f Log.final.out Log.out Log.progress.out SJ.out.tab geckodriver.log" + \
+        "STAR --genomeLoad Remove --genomeDir {config[genome_index]} --outSAMmode None;",
+        # "mail -s ", 
+        # "STAR --version",
+        conda_env="/home/luolab/GITHUB_REPO/ScRNAseq_smkpipe_at_Luolab/.snakemake/conda/e9e317d19678f2458891b4f29ae2546c")
