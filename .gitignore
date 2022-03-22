@@ -6,6 +6,8 @@ SJ.out.tab
 report.html
 .snakemake/*
 workflow/data/*
+workflow/snakemake-cache
+workflow/snakemake-cache/*
 config/config.*
 config/sample_table_*.csv
 config/barcode_ground_truth_checklist*

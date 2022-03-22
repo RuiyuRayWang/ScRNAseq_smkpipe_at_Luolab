@@ -1,7 +1,5 @@
 ## TODO: Initialize project structure per config.yaml - user/project/etc.
 
-## TODO: FASTQ file quality control & summarize QC statistics
-
 # Step 1: Identify cell barcode whitelist (identify correct BC)
 rule umi_tools_whitelist:
     input:
@@ -72,6 +70,7 @@ rule STAR_gen:
         directory(config["genome_index"])
     params:
         sjdbOverhang=config["sjdbOverhang"]
+    cache: True
     conda:
         "../envs/master.yaml"
     threads:
@@ -90,7 +89,7 @@ rule STAR_gen:
 rule STAR_load:
     input:
         ex=get_files('umi_tools_extract'),
-        genomeDir=config["genome_index"]
+        genomeDir=directory(config["genome_index"])
     output:
         temp(touch("tmp/STARload.done"))
     conda:
@@ -152,8 +151,6 @@ rule STAR_unload:
              --genomeDir {input.genomeDir} \
              --outSAMmode None
         """
-
-## TODO: STAR mapping summarize statistics
 
 # Step 5-1: Assign reads to genes (featureCount)
 rule featureCounts:
@@ -262,11 +259,11 @@ rule qc_report:
 onsuccess:
     shell("rm -f Log.final.out Log.out Log.progress.out SJ.out.tab geckodriver.log")
 
-onerror:
-    ## TODO: Get conda env through parser
-    shell(
-        "rm -f Log.final.out Log.out Log.progress.out SJ.out.tab geckodriver.log" + \
-        "STAR --genomeLoad Remove --genomeDir {config[genome_index]} --outSAMmode None;",
-        # "mail -s ", 
-        # "STAR --version",
-        conda_env="/home/luolab/GITHUB_REPO/ScRNAseq_smkpipe_at_Luolab/.snakemake/conda/e9e317d19678f2458891b4f29ae2546c")
+# onerror:
+#     ## TODO: Get conda env through parser
+#     shell(
+#         "rm -f Log.final.out Log.out Log.progress.out SJ.out.tab geckodriver.log" + \
+#         "STAR --genomeLoad Remove --genomeDir {config[genome_index]} --outSAMmode None;",
+#         # "mail -s ", 
+#         # "STAR --version",
+#         conda_env="/home/luolab/GITHUB_REPO/ScRNAseq_smkpipe_at_Luolab/.snakemake/conda/e9e317d19678f2458891b4f29ae2546c")
