@@ -116,7 +116,7 @@ rule STAR:
     conda:
         "../envs/master.yaml"
     threads:
-        # STAR sometimes fails because of too many opened files (due to high thread count). Lower thread number here if necessary.
+        # STAR sometimes fails as too many files are opened (due to high thread number). Decrease thread number here if necessary.
         16
     shell:
         """
