@@ -171,24 +171,24 @@ We adopt a comprehensive pipeline described in the [umi_tools documentation](htt
 # Step 1: Identify correct cell barcodes (umi_tools whitelist)
 umi_tools whitelist --bc-pattern=CCCCCCCCNNNNNNNN \
                     --log=LIBRARY_whitelist.log \
-		                --set-cell-number=100 \
-		                --plot-prefix=LIBRARY \
-		                --stdin=LIBRARY_R2.fq.gz \  ## R1 and R2 are swapped b.c. we customized our protocol
-		                --stdout=LIBRARY_whitelist.txt
+                    --set-cell-number=100 \
+                    --plot-prefix=LIBRARY \
+                    --stdin=LIBRARY_R2.fq.gz \  ## R1 and R2 are swapped b.c. we customized our protocol
+                    --stdout=LIBRARY_whitelist.txt
 
 # Step 2: Wash whitelist
 (implemented by scripts/wash_whitelist.py) 
 
 # Step 3: Extract barcodes and UMIs and add to read names
 umi_tools extract --bc-pattern=CCCCCCCCNNNNNNNN \
-		              --log=extract.log \
-		              --stdin=LIBRARY_R2.fq.gz \
-		              --read2-in=LIBRARY_R1.fq.gz \
-		              --stdout=LIBRARY_extracted.fq.gz \
-		              --read2-stdout \
-      		        --filter-cell-barcode \
-		              --error-correct-cell \
-		              --whitelist=whitelist_washed.txt
+                  --log=extract.log \
+                  --stdin=LIBRARY_R2.fq.gz \
+                  --read2-in=LIBRARY_R1.fq.gz \
+                  --stdout=LIBRARY_extracted.fq.gz \
+                  --read2-stdout \
+                  --filter-cell-barcode \
+                  --error-correct-cell \
+                  --whitelist=whitelist_washed.txt
 
 # Step 4-0: Generate genome index
 STAR --runThreadN 32 \
@@ -225,10 +225,10 @@ STAR --genomeLoad Remove \
 
 # Step 5-1: Assign reads to genes
 featureCounts -s 1 \
-	            -a annotation.gtf \
-	            -o LIBRARY_gene_assigned \
-	            -R BAM LIBRARY_Aligned.sortedByCoord.out.bam \
-	            -T 32
+              -a annotation.gtf \
+              -o LIBRARY_gene_assigned \
+              -R BAM LIBRARY_Aligned.sortedByCoord.out.bam \
+              -T 32
 
 # Step 5-2: Sort and index BAM file
 sambamba sort -t 32 -m 64G \
@@ -237,11 +237,11 @@ sambamba sort -t 32 -m 64G \
 
 # Step 6: Count UMIs per gene per cell
 umi_tools count --per-gene \
-		            --per-cell \
-		            --gene-tag=XT \
+                --per-cell \
+                --gene-tag=XT \
                 --log={log} \
-		            --stdin=LIBRARY_assigned_sorted.bam \
-		            --stdout=LIBRARY_counts.tsv.gz
+                --stdin=LIBRARY_assigned_sorted.bam \
+                --stdout=LIBRARY_counts.tsv.gz
 
 # Step 7: Append suffix to cells
 (implemented by scripts/append_suffix.py)
