@@ -25,5 +25,6 @@ for read in iter:
     read.set_tag('UB', str.split(read.query_name, sep='_')[2], replace=False)
     read.query_name = str.split(read.query_name, sep='_')[0]
     outfile.write(read)
+
 infile.close()
 outfile.close()

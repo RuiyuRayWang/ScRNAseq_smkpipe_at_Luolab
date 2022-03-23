@@ -223,19 +223,32 @@ STAR --runThreadN 32 \
 STAR --genomeLoad Remove \
      --genomeDir /path/to/genome/index
 
-# Step 5-1: Assign reads to genes
+# Step 5: Assign reads to genes
 featureCounts -s 1 \
               -a annotation.gtf \
               -o LIBRARY_gene_assigned \
               -R BAM LIBRARY_Aligned.sortedByCoord.out.bam \
               -T 32
 
-# Step 5-2: Sort and index BAM file
+# Step 6-1: Sort and index BAM
 sambamba sort -t 32 -m 64G \
               -o LIBRARY_assigned_sorted.bam \
-              LIBRARY_Aligned.sortedByCoord.out.bam.featureCounts.bam 
+              LIBRARY_Aligned.sortedByCoord.out.bam.featureCounts.bam
 
-# Step 6: Count UMIs per gene per cell
+# (Optional if rna_velo=True) Step 7-1: Parse CB UB tag
+scripts/edit_bam_tag.py < LIBRARY_assigned_sorted.bam > LIBRARY_tagged.bam
+
+# Step 7-2: Create pre-sorted BAM for velocyto
+samtools sort -@ 32 \
+              -t CB \
+              -O BAM \
+              -o cellsorted_LIBRARY_tagged.bam \
+              LIBRARY_tagged.bam
+
+# Step 7-3: Generate velocyto loom file
+velocyto run -o velo LIBRARY_tagged.bam /path/to/gtf
+
+# Step 9: Count UMIs per gene per cell
 umi_tools count --per-gene \
                 --per-cell \
                 --gene-tag=XT \
@@ -243,10 +256,10 @@ umi_tools count --per-gene \
                 --stdin=LIBRARY_assigned_sorted.bam \
                 --stdout=LIBRARY_counts.tsv.gz
 
-# Step 7: Append suffix to cells
+# Step 10: Append suffix to cells
 (implemented by scripts/append_suffix.py)
 
-# Step 8: Aggregate counts
+# Step 11: Aggregate counts
 zcat LIBRARY1_counts.tsv.gz LIBRARY2_counts.tsv.gz ... | gzip > outs/PROJECT_counts_all.tsv.gz
 ```
 
