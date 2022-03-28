@@ -62,6 +62,8 @@ def parse_suffix(rule):
         return 'extract.log'
     elif rule == "log_count":
         return 'count.log'
+    elif rule == "velocyto":
+        return 'velocyto.loom'
 
 def get_files(rule):
     files = expand(
@@ -107,6 +109,13 @@ def parse_fc_dummy(wc):
         return ""
     else:
         return "tmp/STARunload.done"
+
+def get_velocyto_output():
+    if config['RNA_velocity']:
+        return list(set(expand("workflow/data/{user}/{project}/outs/{project}_velocyto_all.loom", 
+        zip, user=samples.User.to_list(), project=samples.Project.to_list())))
+    else:
+        return ""
 
 def get_report_output():
     return list(set(expand("workflow/data/{user}/{project}/outs/{project}_{suffix}", 

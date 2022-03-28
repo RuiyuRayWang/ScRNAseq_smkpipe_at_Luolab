@@ -230,7 +230,7 @@ featureCounts -s 1 \
               -R BAM LIBRARY_Aligned.sortedByCoord.out.bam \
               -T 32
 
-# Step 6-1: Sort and index BAM
+# Step 6: Sort and index BAM
 sambamba sort -t 32 -m 64G \
               -o LIBRARY_assigned_sorted.bam \
               LIBRARY_Aligned.sortedByCoord.out.bam.featureCounts.bam
@@ -246,7 +246,11 @@ samtools sort -@ 32 \
               LIBRARY_tagged.bam
 
 # Step 7-3: Generate velocyto loom file
-velocyto run -o velo LIBRARY_tagged.bam /path/to/gtf
+velocyto run -o . -e LIBRARY_velocyto LIBRARY_tagged.bam /path/to/gtf
+
+# Step 7-4: Aggregate velocyto looms
+import loompy
+loompy.combine()
 
 # Step 9: Count UMIs per gene per cell
 umi_tools count --per-gene \
