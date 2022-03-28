@@ -46,6 +46,8 @@ Once everything is setup, prepare your own real data that will be analyzed.
 
 In the `config/` directory, edit the `sample_table.csv` and `config.yaml` files. These will be used by the pipeline to locate your data and setup the file structure. Make sure to specify in `config.yaml` the correct **genome index**, **barcode-ground-truth list** and **gtf annotations**. You can use the `config/sample_table_example.csv` and `config/config_example.yaml` as a templates to guide your through this step.
 
+You may configure whether RNA velocity pipeline should be performed by specifying `RNA_velocity: True/False`.
+
 We highly recommend the users take a close look at the file structure generated from the example run (sub-folders in `workflow/data`).
 
 For each library, we use a dedicated folder to hold the `R1` and `R2` fastq read pairs.
@@ -105,8 +107,9 @@ You should see a `report.html` output in your current working directory.
 
 ## Notes
 
-* 2022/3/23:
-Updates: introducing RNA velocity analysis into the pipeline, through [`velocyto`](http://velocyto.org/). Each assigned sorted bam file was run against `velocyto` through CLI, and a loom object was generated. After loom files for all libraries were generated, they were aggregated into a single loom object.
+* 2022/3/23:  
+Updates: introducing RNA velocity analysis into the pipeline, through [`velocyto`](http://velocyto.org/).  
+Each assigned sorted bam file was run against `velocyto` through CLI, and a loom object was generated. After loom files for all libraries were generated, they were aggregated into a single loom object.
 
 * 2022/2/17:  
 Updates: incorporated snakemake `report` feature to generate runtime summaries and quality controls (QCs) of jobs.  
