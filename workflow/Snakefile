@@ -8,5 +8,6 @@ rule all:
     input:
     # Final outputs
         parse_dynamic_output('append_sfx'),
+        get_velocyto_output(),
         get_report_output(),
         get_aggr_output()

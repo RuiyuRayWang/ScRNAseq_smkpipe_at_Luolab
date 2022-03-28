@@ -61,7 +61,7 @@ rule umi_tools_extract:
                           --whitelist={input.whitelist_washed}
         """
 
-# # Step 4-0: Generate genome index
+# Step 4-0: Generate genome index
 rule STAR_gen:
     input:
         genome_fa=config["genome_fa"],
@@ -85,11 +85,11 @@ rule STAR_gen:
              --sjdbOverhang {params.sjdbOverhang}
         """
 
-# # Step 4-1: Load Genome Index
+# Step 4-1: Load genome index to memory
 rule STAR_load:
     input:
         ex=get_files('umi_tools_extract'),
-        genomeDir=directory(config["genome_index"])
+        genomeDir=config["genome_index"]
     output:
         temp(touch("tmp/STARload.done"))
     conda:
@@ -104,6 +104,7 @@ rule STAR_load:
              --outSAMmode None
         """
 
+# Step 4-2: Map reads
 rule STAR:
     input:
         extracted_fq="workflow/data/{user}/{project}/alignments/{library}/{library}_extracted.fq.gz",
@@ -136,7 +137,7 @@ rule STAR:
              --outFileNamePrefix workflow/data/{wildcards.user}/{wildcards.project}/alignments/{wildcards.library}/{wildcards.library}_
         """
 
-# Step 4-2: Unload STAR genome index
+# Step 4-3: Unload STAR genome
 rule STAR_unload:
     input:
         bams=parse_dynamic_output('STAR'),
@@ -152,15 +153,15 @@ rule STAR_unload:
              --outSAMmode None
         """
 
-# Step 5-1: Assign reads to genes (featureCount)
+# Step 5: Assign reads to genes (featureCount)
 rule featureCounts:
     input:
         gtf=config["gtf_annotation"],
         bam="workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam",
-        # dummy="tmp/STARunload.done"
-        dummy=parse_fc_dummy,
+        dummy="tmp/STARunload.done"
+        # dummy=parse_fc_dummy,
     output:
-        assigned="workflow/data/{user}/{project}/alignments/{library}/{library}_gene_assigned",
+        assigned=temp("workflow/data/{user}/{project}/alignments/{library}/{library}_gene_assigned"),
         summary=report("workflow/data/{user}/{project}/alignments/{library}/{library}_gene_assigned.summary", caption="../report/featureCounts.rst", category="featureCounts"),
         bam_counted=temp("workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam.featureCounts.bam")
     conda:
@@ -176,12 +177,13 @@ rule featureCounts:
                       -T {threads}
         """
 
-# Step 5-2: Assign reads to genes (sort bam files)
+# Step 6: Sort and index BAM
 rule sambamba_sort:
     input:
         "workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam.featureCounts.bam"
     output:
-        temp("workflow/data/{user}/{project}/alignments/{library}/{library}_assigned_sorted.bam")
+        bam=temp("workflow/data/{user}/{project}/alignments/{library}/{library}_assigned_sorted.bam"),
+        index=temp("workflow/data/{user}/{project}/alignments/{library}/{library}_assigned_sorted.bam.bai")
     conda:
         "../envs/master.yaml"
     threads:
@@ -189,14 +191,82 @@ rule sambamba_sort:
     shell:
         """
         sambamba sort -t {threads} -m 64G \
+                      -o {output.bam} \
+                      {input}
+        """
+
+# (Optional) Step 7-1: Parse CB UB tag
+rule pysam:
+    input:
+        "workflow/data/{user}/{project}/alignments/{library}/{library}_assigned_sorted.bam",
+        "workflow/data/{user}/{project}/alignments/{library}/{library}_assigned_sorted.bam.bai"
+    output:
+        temp("workflow/data/{user}/{project}/alignments/{library}/{library}_tagged.bam")
+    conda:
+        "../envs/velocyto.yaml"
+    threads:
+        1
+    script:
+        "../scripts/edit_bam_tag.py"
+
+# Step 7-2: Create pre-sorted BAM for velocyto
+rule pre_sort:
+    input:
+        "workflow/data/{user}/{project}/alignments/{library}/{library}_tagged.bam"
+    output:
+        temp("workflow/data/{user}/{project}/alignments/{library}/cellsorted_{library}_tagged.bam")
+    conda:
+        "../envs/master.yaml"
+    threads:
+        config["threads"]
+    shell:
+        """
+        samtools sort -@ {threads} \
+                      -t CB \
+                      -O BAM \
                       -o {output} \
                       {input}
         """
 
-# Step 6: Count UMIs per gene per cell
+# Step 7-3: Generate velocyto loom file
+rule velocyto:
+    input:
+        bam="workflow/data/{user}/{project}/alignments/{library}/{library}_tagged.bam",
+        sorted_bam="workflow/data/{user}/{project}/alignments/{library}/cellsorted_{library}_tagged.bam",
+        gtf=config["gtf_annotation"]
+    output:
+        temp("workflow/data/{user}/{project}/alignments/{library}/{library}_velocyto.loom")
+    conda:
+        "../envs/velocyto.yaml"
+    threads:
+        16
+    shell:
+        """
+        velocyto run -o workflow/data/{wildcards.user}/{wildcards.project}/alignments/{wildcards.library} \
+                     -v \
+                     -e {wildcards.library}_velocyto \
+                     {input.bam} \
+                     {input.gtf}
+        """
+
+# Step 7-4: Aggregate velocyto loom file
+rule aggr_velo_loom:
+    input:
+        get_files("velocyto")
+    output:
+        "workflow/data/{user}/{project}/outs/{project}_velocyto_all.loom"
+    conda:
+        "../envs/velocyto.yaml"
+    threads:
+        1
+    script:
+        "../scripts/aggr_velo_loom.py"
+
+# Step 8: Count UMIs per gene per cell
 rule umi_tools_count:
     input:
-        "workflow/data/{user}/{project}/alignments/{library}/{library}_assigned_sorted.bam"
+        bam="workflow/data/{user}/{project}/alignments/{library}/{library}_assigned_sorted.bam",
+        index="workflow/data/{user}/{project}/alignments/{library}/{library}_assigned_sorted.bam.bai"
     output:
         temp("workflow/data/{user}/{project}/alignments/{library}/{library}_counts_raw.tsv.gz")
     log:
@@ -211,11 +281,11 @@ rule umi_tools_count:
                         --per-cell \
                         --gene-tag=XT \
                         --log={log} \
-                        --stdin={input} \
+                        --stdin={input.bam} \
                         --stdout={output} \
         """
 
-# Step 7: Append suffix to cells
+# Step 9: Append suffix to cells
 rule append_sfx:
     input:
         "workflow/data/{user}/{project}/alignments/{library}/{library}_counts_raw.tsv.gz"
@@ -226,7 +296,7 @@ rule append_sfx:
     script:
         "../scripts/append_suffix.py"
 
-# Step 8: Aggregate counts
+# Step 10: Aggregate counts
 rule aggr_counts:
     input:
         get_files("append_sfx")
@@ -239,7 +309,7 @@ rule aggr_counts:
         zcat {input} | sed '2, ${{/gene/d;}}' | gzip > {output}
         """
 
-# Step 9: QC report
+# Step 11: QC report
 rule qc_report:
     input:
         log_whitelist=get_logfiles("log_whitelist"),
