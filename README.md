@@ -105,6 +105,9 @@ You should see a `report.html` output in your current working directory.
 
 ## Notes
 
+* 2022/3/23:
+Updates: introducing RNA velocity analysis into the pipeline, through [`velocyto`](http://velocyto.org/). Each assigned sorted bam file was run against `velocyto` through CLI, and a loom object was generated. After loom files for all libraries were generated, they were aggregated into a single loom object.
+
 * 2022/2/17:  
 Updates: incorporated snakemake `report` feature to generate runtime summaries and quality controls (QCs) of jobs.  
 Due to a weird conflict between snakemake internal mechanism and the way we handle STAR Shared memory feature, the report mechanism can be only instantiated in a separate branch apart from the `main` branch. See [report section](#generate-snakemake-report-for-jobs) in this doc.
