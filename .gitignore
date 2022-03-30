@@ -9,7 +9,8 @@ workflow/data/*
 workflow/snakemake-cache
 workflow/snakemake-cache/*
 config/config.*
-config/sample_table_*.csv
+config/samples_table_*.csv
+config/units_table_*.csv
 config/barcode_ground_truth_checklist*
 
 # Except the example files
@@ -19,15 +20,16 @@ workflow/data/WangRuiyu/Example/*
 !workflow/data/WangRuiyu/Example/README.md
 !workflow/data/WangRuiyu/Example/fastqs/
 workflow/data/WangRuiyu/Example/fastqs/*
-!workflow/data/WangRuiyu/Example/fastqs/Testdata1
-!workflow/data/WangRuiyu/Example/fastqs/Testdata2
-workflow/data/WangRuiyu/Example/fastqs/Testdata1/*
-workflow/data/WangRuiyu/Example/fastqs/Testdata2/*
-!workflow/data/WangRuiyu/Example/fastqs/Testdata2/MD5.txt
-!workflow/data/WangRuiyu/Example/fastqs/Testdata1/MD5.txt
+!workflow/data/WangRuiyu/Example/fastqs/Sample1
+!workflow/data/WangRuiyu/Example/fastqs/Sample2
+workflow/data/WangRuiyu/Example/fastqs/Sample1/*
+workflow/data/WangRuiyu/Example/fastqs/Sample2/*
+#!workflow/data/WangRuiyu/Example/fastqs/Sample1/MD5.txt
+!workflow/data/WangRuiyu/Example/fastqs/Sample2/MD5.txt
 ## Example config files
 !config/config_example.yaml
-!config/sample_table_example.csv
+!config/samples_table_example.csv
+!config/units_table_example.csv
 !config/barcode_ground_truth_checklist_example.csv
 
 # Byte-compiled / optimized / DLL files

@@ -7,5 +7,5 @@ def append_suffix(file_path,
     return counts
 
 counts = append_suffix(file_path = snakemake.input[0],
-                       suffix = snakemake.wildcards.library)
+                       suffix = snakemake.wildcards.sample)
 counts.to_csv(snakemake.output[0], index=False, sep="\t", compression="gzip")

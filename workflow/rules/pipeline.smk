@@ -1,14 +1,12 @@
-## TODO: Initialize project structure per config.yaml - user/project/etc.
-
 # Step 1: Identify cell barcode whitelist (identify correct BC)
 rule umi_tools_whitelist:
     input:
         unpack(get_fastqs),
     output:
-        "workflow/data/{user}/{project}/alignments/{library}/{library}_whitelist.txt",
-        report("workflow/data/{user}/{project}/alignments/{library}/{library}_cell_barcode_counts.png", caption="../report/umi_tools_whitelist.rst", category="umi_tools")
+        "workflow/data/{user}/{project}/alignments/{sample}/{sample}_whitelist.txt",
+        report("workflow/data/{user}/{project}/alignments/{sample}/{sample}_cell_barcode_counts.png", caption="../report/umi_tools_whitelist.rst", category="umi_tools")
     log:
-        "workflow/data/{user}/{project}/logs/{library}/{library}_whitelist.log"
+        "workflow/data/{user}/{project}/logs/{sample}/{sample}_whitelist.log"
     conda:
         "../envs/master.yaml"
     threads:
@@ -18,7 +16,7 @@ rule umi_tools_whitelist:
         umi_tools whitelist --bc-pattern=CCCCCCCCNNNNNNNN \
                             --log={log} \
                             --set-cell-number=100 \
-                            --plot-prefix=workflow/data/{wildcards.user}/{wildcards.project}/alignments/{wildcards.library}/{wildcards.library} \
+                            --plot-prefix=workflow/data/{wildcards.user}/{wildcards.project}/alignments/{wildcards.sample}/{wildcards.sample} \
                             --stdin={input.read1} \
                             --stdout={output}
         """
@@ -26,10 +24,10 @@ rule umi_tools_whitelist:
 # Step 2: Wash whitelist
 rule wash_whitelist:
     input:
-        whitelist="workflow/data/{user}/{project}/alignments/{library}/{library}_whitelist.txt",
+        whitelist="workflow/data/{user}/{project}/alignments/{sample}/{sample}_whitelist.txt",
         ground_truth=config['ground_truth']
     output:
-        "workflow/data/{user}/{project}/alignments/{library}/{library}_whitelist_washed.txt"
+        "workflow/data/{user}/{project}/alignments/{sample}/{sample}_whitelist_washed.txt"
     threads:
         1
     script:
@@ -39,11 +37,11 @@ rule wash_whitelist:
 rule umi_tools_extract:
     input:
         unpack(get_fastqs),
-        whitelist_washed="workflow/data/{user}/{project}/alignments/{library}/{library}_whitelist_washed.txt"
+        whitelist_washed="workflow/data/{user}/{project}/alignments/{sample}/{sample}_whitelist_washed.txt"
     output:
-        "workflow/data/{user}/{project}/alignments/{library}/{library}_extracted.fq.gz",
+        "workflow/data/{user}/{project}/alignments/{sample}/{sample}_extracted.fq.gz",
     log:
-        "workflow/data/{user}/{project}/logs/{library}/{library}_extract.log"
+        "workflow/data/{user}/{project}/logs/{sample}/{sample}_extract.log"
     conda:
         "../envs/master.yaml"
     threads:
@@ -107,13 +105,13 @@ rule STAR_load:
 # Step 4-2: Map reads
 rule STAR:
     input:
-        extracted_fq="workflow/data/{user}/{project}/alignments/{library}/{library}_extracted.fq.gz",
+        extracted_fq="workflow/data/{user}/{project}/alignments/{sample}/{sample}_extracted.fq.gz",
         genomeDir=config["genome_index"],
         # dummy="tmp/STARload.done"
         dummy=parse_STAR_dummy,
     output:
-        bam="workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam",
-        lf=report("workflow/data/{user}/{project}/alignments/{library}/{library}_Log.final.out", caption="../report/STAR.rst", category="STAR")
+        bam="workflow/data/{user}/{project}/alignments/{sample}/{sample}_Aligned.sortedByCoord.out.bam",
+        lf=report("workflow/data/{user}/{project}/alignments/{sample}/{sample}_Log.final.out", caption="../report/STAR.rst", category="STAR")
     conda:
         "../envs/master.yaml"
     threads:
@@ -134,7 +132,7 @@ rule STAR:
              --outFilterMismatchNmax 6 \
              --outSAMtype BAM SortedByCoordinate \
              --outSAMunmapped Within \
-             --outFileNamePrefix workflow/data/{wildcards.user}/{wildcards.project}/alignments/{wildcards.library}/{wildcards.library}_
+             --outFileNamePrefix workflow/data/{wildcards.user}/{wildcards.project}/alignments/{wildcards.sample}/{wildcards.sample}_
         """
 
 # Step 4-3: Unload STAR genome
@@ -157,13 +155,13 @@ rule STAR_unload:
 rule featureCounts:
     input:
         gtf=config["gtf_annotation"],
-        bam="workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam",
+        bam="workflow/data/{user}/{project}/alignments/{sample}/{sample}_Aligned.sortedByCoord.out.bam",
         # dummy="tmp/STARunload.done"
         dummy=parse_fc_dummy,
     output:
-        assigned=temp("workflow/data/{user}/{project}/alignments/{library}/{library}_gene_assigned"),
-        summary=report("workflow/data/{user}/{project}/alignments/{library}/{library}_gene_assigned.summary", caption="../report/featureCounts.rst", category="featureCounts"),
-        bam_counted=temp("workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam.featureCounts.bam")
+        assigned=temp("workflow/data/{user}/{project}/alignments/{sample}/{sample}_gene_assigned"),
+        summary=report("workflow/data/{user}/{project}/alignments/{sample}/{sample}_gene_assigned.summary", caption="../report/featureCounts.rst", category="featureCounts"),
+        bam_counted=temp("workflow/data/{user}/{project}/alignments/{sample}/{sample}_Aligned.sortedByCoord.out.bam.featureCounts.bam")
     conda:
         "../envs/master.yaml"
     threads:
@@ -180,10 +178,10 @@ rule featureCounts:
 # Step 6: Sort and index BAM
 rule sambamba_sort:
     input:
-        "workflow/data/{user}/{project}/alignments/{library}/{library}_Aligned.sortedByCoord.out.bam.featureCounts.bam"
+        "workflow/data/{user}/{project}/alignments/{sample}/{sample}_Aligned.sortedByCoord.out.bam.featureCounts.bam"
     output:
-        bam=temp("workflow/data/{user}/{project}/alignments/{library}/{library}_assigned_sorted.bam"),
-        index=temp("workflow/data/{user}/{project}/alignments/{library}/{library}_assigned_sorted.bam.bai")
+        bam=temp("workflow/data/{user}/{project}/alignments/{sample}/{sample}_assigned_sorted.bam"),
+        index=temp("workflow/data/{user}/{project}/alignments/{sample}/{sample}_assigned_sorted.bam.bai")
     conda:
         "../envs/master.yaml"
     threads:
@@ -198,10 +196,10 @@ rule sambamba_sort:
 # (Optional) Step 7-1: Parse CB UB tag
 rule pysam:
     input:
-        "workflow/data/{user}/{project}/alignments/{library}/{library}_assigned_sorted.bam",
-        "workflow/data/{user}/{project}/alignments/{library}/{library}_assigned_sorted.bam.bai"
+        "workflow/data/{user}/{project}/alignments/{sample}/{sample}_assigned_sorted.bam",
+        "workflow/data/{user}/{project}/alignments/{sample}/{sample}_assigned_sorted.bam.bai"
     output:
-        temp("workflow/data/{user}/{project}/alignments/{library}/{library}_tagged.bam")
+        temp("workflow/data/{user}/{project}/alignments/{sample}/{sample}_tagged.bam")
     conda:
         "../envs/velocyto.yaml"
     threads:
@@ -212,9 +210,9 @@ rule pysam:
 # Step 7-2: Create pre-sorted BAM for velocyto
 rule pre_sort:
     input:
-        "workflow/data/{user}/{project}/alignments/{library}/{library}_tagged.bam"
+        "workflow/data/{user}/{project}/alignments/{sample}/{sample}_tagged.bam"
     output:
-        temp("workflow/data/{user}/{project}/alignments/{library}/cellsorted_{library}_tagged.bam")
+        temp("workflow/data/{user}/{project}/alignments/{sample}/cellsorted_{sample}_tagged.bam")
     conda:
         "../envs/master.yaml"
     threads:
@@ -231,20 +229,20 @@ rule pre_sort:
 # Step 7-3: Generate velocyto loom file
 rule velocyto:
     input:
-        bam="workflow/data/{user}/{project}/alignments/{library}/{library}_tagged.bam",
-        sorted_bam="workflow/data/{user}/{project}/alignments/{library}/cellsorted_{library}_tagged.bam",
+        bam="workflow/data/{user}/{project}/alignments/{sample}/{sample}_tagged.bam",
+        sorted_bam="workflow/data/{user}/{project}/alignments/{sample}/cellsorted_{sample}_tagged.bam",
         gtf=config["gtf_annotation"]
     output:
-        temp("workflow/data/{user}/{project}/alignments/{library}/{library}_velocyto.loom")
+        temp("workflow/data/{user}/{project}/alignments/{sample}/{sample}_velocyto.loom")
     conda:
         "../envs/velocyto.yaml"
     threads:
         16
     shell:
         """
-        velocyto run -o workflow/data/{wildcards.user}/{wildcards.project}/alignments/{wildcards.library} \
+        velocyto run -o workflow/data/{wildcards.user}/{wildcards.project}/alignments/{wildcards.sample} \
                      -v \
-                     -e {wildcards.library}_velocyto \
+                     -e {wildcards.sample}_velocyto \
                      {input.bam} \
                      {input.gtf}
         """
@@ -265,12 +263,12 @@ rule aggr_velo_loom:
 # Step 8: Count UMIs per gene per cell
 rule umi_tools_count:
     input:
-        bam="workflow/data/{user}/{project}/alignments/{library}/{library}_assigned_sorted.bam",
-        index="workflow/data/{user}/{project}/alignments/{library}/{library}_assigned_sorted.bam.bai"
+        bam="workflow/data/{user}/{project}/alignments/{sample}/{sample}_assigned_sorted.bam",
+        index="workflow/data/{user}/{project}/alignments/{sample}/{sample}_assigned_sorted.bam.bai"
     output:
-        temp("workflow/data/{user}/{project}/alignments/{library}/{library}_counts_raw.tsv.gz")
+        temp("workflow/data/{user}/{project}/alignments/{sample}/{sample}_counts_raw.tsv.gz")
     log:
-        "workflow/data/{user}/{project}/logs/{library}/{library}_count.log"
+        "workflow/data/{user}/{project}/logs/{sample}/{sample}_count.log"
     conda:
         "../envs/master.yaml"
     threads:
@@ -288,9 +286,9 @@ rule umi_tools_count:
 # Step 9: Append suffix to cells
 rule append_sfx:
     input:
-        "workflow/data/{user}/{project}/alignments/{library}/{library}_counts_raw.tsv.gz"
+        "workflow/data/{user}/{project}/alignments/{sample}/{sample}_counts_raw.tsv.gz"
     output:
-        "workflow/data/{user}/{project}/alignments/{library}/{library}_counts.tsv.gz"
+        "workflow/data/{user}/{project}/alignments/{sample}/{sample}_counts.tsv.gz"
     threads:
         1
     script:

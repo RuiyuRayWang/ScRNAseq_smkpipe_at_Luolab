@@ -1,11 +1,19 @@
 # Project info
-user: WangRuiyu
+User: WangRuiyu
 Project: Example
-samples: config/sample_table_example.csv
-RNA_velocity: True
+Samples: config/samples_table_example.csv
+Units: config/units_table_example.csv
+src_fq_dir: /mnt/ZA1BT1ER/RAW_DATA/WangRuiyu
+tmp_fq_dir: /mnt/WKD0P26R/TMP
+aln_dir: /mnt/ZA1BT1ER/INTERMEDIATE_RES/WangRuiyu/Example/alignments
+log_dir:
+misc_dir: 
+out_dir:
 
-r1_extensions: ['*R1.fq.gz']
-r2_extensions: ['*R2.fq.gz']
+r1_extensions: ['R1.fq.gz']
+r2_extensions: ['R2.fq.gz']
+
+RNA_velocity: True
 
 genome_fa: 
   - "/mnt/ZA1BT1ER/RESOURCES/ensembl/release_102/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna_rm.primary_assembly.fa"
