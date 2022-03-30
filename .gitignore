@@ -18,14 +18,16 @@ config/barcode_ground_truth_checklist*
 !workflow/data/WangRuiyu/
 workflow/data/WangRuiyu/Example/*
 !workflow/data/WangRuiyu/Example/README.md
-!workflow/data/WangRuiyu/Example/fastqs/
-workflow/data/WangRuiyu/Example/fastqs/*
-!workflow/data/WangRuiyu/Example/fastqs/Sample1
-!workflow/data/WangRuiyu/Example/fastqs/Sample2
-workflow/data/WangRuiyu/Example/fastqs/Sample1/*
-workflow/data/WangRuiyu/Example/fastqs/Sample2/*
-#!workflow/data/WangRuiyu/Example/fastqs/Sample1/MD5.txt
-!workflow/data/WangRuiyu/Example/fastqs/Sample2/MD5.txt
+!workflow/data/WangRuiyu/Example/raw_fastqs/
+workflow/data/WangRuiyu/Example/raw_fastqs/*
+!workflow/data/WangRuiyu/Example/raw_fastqs/Batch_1
+!workflow/data/WangRuiyu/Example/raw_fastqs/Batch_2
+workflow/data/WangRuiyu/Example/raw_fastqs/Batch_1/*
+workflow/data/WangRuiyu/Example/raw_fastqs/Batch_2/*
+!workflow/data/WangRuiyu/Example/raw_fastqs/Batch_1/2.cleandata
+!workflow/data/WangRuiyu/Example/raw_fastqs/Batch_2/2.cleandata
+workflow/data/WangRuiyu/Example/raw_fastqs/Batch_1/2.cleandata/*
+workflow/data/WangRuiyu/Example/raw_fastqs/Batch_2/2.cleandata/*
 ## Example config files
 !config/config_example.yaml
 !config/samples_table_example.csv

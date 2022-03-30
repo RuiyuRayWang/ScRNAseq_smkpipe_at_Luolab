@@ -32,7 +32,7 @@ def parse_qc_regex(rule, stat):
             ## whitelist: unique cell barcodes
             return r"^.*(?:Found) (\d+) (?:unique cell barcodes)$"
         elif stat=="n_reads_selected":
-            ## whitelist: 
+            ## whitelist: how many reads have a cell barcode in the whitelist
             return r"^.*(?:Found) (\d+) (?:total reads matching the selected cell barcodes)$"
         elif stat=="n_reads_correctable":
             ## whitelist: error correctable reads

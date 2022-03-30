@@ -3,7 +3,7 @@ User: WangRuiyu
 Project: Example
 Samples: config/samples_table_example.csv
 Units: config/units_table_example.csv
-src_fq_dir: /mnt/ZA1BT1ER/RAW_DATA/WangRuiyu
+src_fq_dir: 
 tmp_fq_dir: /mnt/WKD0P26R/TMP
 aln_dir: /mnt/ZA1BT1ER/INTERMEDIATE_RES/WangRuiyu/Example/alignments
 log_dir:
