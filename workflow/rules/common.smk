@@ -115,9 +115,10 @@ if units['Sample'].duplicated().any():
 
 for sample in set(units['Sample']):
     u_df = units[units['Sample']==sample]
-    Path('workflow', 'data', config['User'], config['Project'], 'fastqs', sample).unlink(missing_ok=True)
+    if Path('workflow', 'data', config['User'], config['Project'], 'fastqs', sample).exists():
+        os.remove(str(Path('workflow', 'data', config['User'], config['Project'], 'fastqs', sample)))
     if len(u_df)==1:
-        path_to_sample = sorted(Path(config['src_fq_dir']).rglob(u_df['Library'].tolist()[0]+'/'))
+        path_to_sample = sorted(Path(config['src_fq_dir'].resolve()).rglob(u_df['Library'].tolist()[0]+'/'))
         if len(path_to_sample) > 1:
             raise ValueError('More than one library observed under sample:' + sample + '. Execution halted.')
         Path('workflow', 'data', config['User'], config['Project'], 'fastqs', sample).symlink_to(path_to_sample[0])
