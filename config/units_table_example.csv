@@ -1,4 +1,4 @@
-User,Project,Sample,Batch,Library,File_R1,File_R2
-WangRuiyu,Example,Sample1,Batch_1,Testdata1_1,,
-WangRuiyu,Example,Sample1,Batch_2,Testdata1_2,,
-WangRuiyu,Example,Sample2,Batch_1,Testdata2,,
+User,Project,Sample,Batch,Library
+WangRuiyu,Example,Sample1,Batch_1,Testdata1_1
+WangRuiyu,Example,Sample1,Batch_2,Testdata1_2
+WangRuiyu,Example,Sample2,Batch_1,Testdata2

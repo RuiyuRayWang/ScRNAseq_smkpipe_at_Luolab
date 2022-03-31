@@ -1,3 +1,16 @@
+# Step 0: Aggregate fastqs
+rule aggr_fqs:
+    input:
+        get_table('units')
+    output:
+    
+    conda:
+        "../envs/master.yaml"
+    threads:
+        1
+    script:
+        "../scripts/aggr_fqs.py"
+
 # Step 1: Identify cell barcode whitelist (identify correct BC)
 rule umi_tools_whitelist:
     input:
