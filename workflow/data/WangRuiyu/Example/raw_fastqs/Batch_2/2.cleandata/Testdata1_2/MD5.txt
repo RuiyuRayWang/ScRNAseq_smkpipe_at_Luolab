@@ -1,0 +1,2 @@
+88f1f10960adef5665af96247025ef43  Testdata1_2_R1.fq.gz
+7da534bfecb5c129e946e12b81d50eef  Testdata1_2_R2.fq.gz
