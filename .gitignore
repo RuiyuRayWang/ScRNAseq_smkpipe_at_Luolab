@@ -28,6 +28,16 @@ workflow/data/WangRuiyu/Example/raw_fastqs/Batch_2/*
 !workflow/data/WangRuiyu/Example/raw_fastqs/Batch_2/2.cleandata
 workflow/data/WangRuiyu/Example/raw_fastqs/Batch_1/2.cleandata/*
 workflow/data/WangRuiyu/Example/raw_fastqs/Batch_2/2.cleandata/*
+!workflow/data/WangRuiyu/Example/raw_fastqs/Batch_1/2.cleandata/Testdata1_1
+!workflow/data/WangRuiyu/Example/raw_fastqs/Batch_1/2.cleandata/Testdata2
+!workflow/data/WangRuiyu/Example/raw_fastqs/Batch_2/2.cleandata/Testdata1_2
+workflow/data/WangRuiyu/Example/raw_fastqs/Batch_1/2.cleandata/Testdata1_1/Testdata1_1_R1.fq.gz
+workflow/data/WangRuiyu/Example/raw_fastqs/Batch_1/2.cleandata/Testdata1_1/Testdata1_1_R2.fq.gz
+workflow/data/WangRuiyu/Example/raw_fastqs/Batch_1/2.cleandata/Testdata2/Testdata2_R1.fq.gz
+workflow/data/WangRuiyu/Example/raw_fastqs/Batch_1/2.cleandata/Testdata2/Testdata2_R2.fq.gz
+workflow/data/WangRuiyu/Example/raw_fastqs/Batch_2/2.cleandata/Testdata1_2/Testdata1_2_R1.fq.gz
+workflow/data/WangRuiyu/Example/raw_fastqs/Batch_2/2.cleandata/Testdata1_2/Testdata1_2_R2.fq.gz
+
 ## Example config files
 !config/config_example.yaml
 !config/samples_table_example.csv
