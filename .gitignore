@@ -18,7 +18,7 @@ config/barcode_ground_truth_checklist*
 !workflow/data/WangRuiyu/
 workflow/data/WangRuiyu/Example/*
 !workflow/data/WangRuiyu/Example/README.md
-!workflow/data/WangRuiyu/Example/raw_fastqs/
+!workflow/data/WangRuiyu/Example/raw_fastqs
 workflow/data/WangRuiyu/Example/raw_fastqs/*
 !workflow/data/WangRuiyu/Example/raw_fastqs/Batch_1
 !workflow/data/WangRuiyu/Example/raw_fastqs/Batch_2
