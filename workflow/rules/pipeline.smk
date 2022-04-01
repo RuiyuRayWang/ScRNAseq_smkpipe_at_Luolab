@@ -1,15 +1,4 @@
 # Step 0: Aggregate fastqs
-# rule aggr_fqs:
-#     input:
-#         get_table
-#     output:
-#         "workflow/data/{user}/{project}/fastqs/{sample}/{sample}_R1.fq.gz",
-#         "workflow/data/{user}/{project}/fastqs/{sample}/{sample}_R2.fq.gz",
-#     threads:
-#         1
-#     script:
-#         "../scripts/aggr_fqs.py"
-
 rule aggr_r1_fqs:
     input:
         unpack(get_r1_aggr_input)

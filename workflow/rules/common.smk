@@ -169,66 +169,6 @@ else:
         samples.at[index,'File_R1'] = os.path.basename(samples.at[index,'path_to_R1'])
         samples.at[index,'File_R2'] = os.path.basename(samples.at[index,'path_to_R2'])
 
-
-# ## Deprecated
-# ## Parse sample/unit table, auto-infer R1 R2 files if not specified
-# def fetch_fqR1R2(table, table_type, config):
-#     fq_r1_extensions = config['r1_extensions']
-#     fq_r2_extensions = config['r2_extensions']
-#     for index, row in table.iterrows():
-#         if table_type == "units":
-#             tmp_dir = os.path.join("workflow", "data", row.User, row.Project, "raw_fastqs")
-#         elif table_type == "samples":
-#             tmp_dir = os.path.join("workflow", "data", row.User, row.Project, "fastqs")
-#         ## TODO: Check that globbed file number equals to 1
-#         if row.File_R1 not in os.listdir(tmp_dir):
-#             table.at[index,'File_R1'] = os.path.basename(list(chain(*[glob.glob(os.path.join(tmp_dir, fq_r1_ext), recursive=True) for fq_r1_ext in fq_r1_extensions]))[0])
-#         if row.File_R2 not in os.listdir(tmp_dir):
-#             table.at[index,'File_R2'] = os.path.basename(list(chain(*[glob.glob(os.path.join(tmp_dir, fq_r2_ext), recursive=True) for fq_r2_ext in fq_r2_extensions]))[0])
-#     return table
-# 
-# def fetch_fqR1R2(table, table_type, config):
-#     fq_r1_extensions = config['r1_extensions']
-#     fq_r2_extensions = config['r2_extensions']
-#     for index, row in table.iterrows():
-#         if table_type == "units":
-#             src_dir = os.path.join("workflow", "data", row.User, row.Project, "raw_fastqs")
-#             table.at[index,'File_R1'] = rget_fq_by_exts(src_dir, row.Library, fq_r1_extensions)
-#             table.at[index,'File_R2'] = rget_fq_by_exts(src_dir, row.Library, fq_r2_extensions)
-#         elif table_type == "samples":
-#             src_dir = os.path.join("workflow", "data", row.User, row.Project, "fastqs")
-#             table.at[index,'path_to_R1'] = rget_fq_by_exts(src_dir, row.Sample, fq_r1_extensions)
-#             table.at[index,'path_to_R2'] = rget_fq_by_exts(src_dir, row.Sample, fq_r2_extensions)
-#             table.at[index,'File_R1'] = os.path.basename(table.at[index,'path_to_R1'])
-#             table.at[index,'File_R2'] = os.path.basename(table.at[index,'path_to_R2'])
-#     return table
-#
-# for sample in set(units['Sample']):
-#     u_df = units[units['Sample']==sample]
-#     if Path('workflow', 'data', config['User'], config['Project'], 'fastqs', sample).exists():
-#         os.remove(str(Path('workflow', 'data', config['User'], config['Project'], 'fastqs', sample)))
-#     if len(u_df)==1:
-#         path_to_sample = sorted(Path(config['src_fq_dir'].resolve()).rglob(u_df['Library'].tolist()[0]+'/'))
-#         if len(path_to_sample) > 1:
-#             raise ValueError('More than one library observed under sample:' + sample + '. Execution halted.')
-#         Path('workflow', 'data', config['User'], config['Project'], 'fastqs', sample).symlink_to(path_to_sample[0])
-#     else:
-#         aggr_dir = Path(config['tmp_fq_dir'], config['User'], config['Project'], sample)
-#         aggr_dir.mkdir(parents=True, exist_ok=True)
-#         if not Path.joinpath(aggr_dir,sample+'_R1.fq.gz').exists():
-#             cat_r1_command = u_df.File_R1.values.tolist()
-#             cat_r1_command.insert(0,'cat')
-#             cat_r1_command.append('> ' + str(aggr_dir) + '/' + sample + '_R1.fq.gz')
-#             os.system(' '.join(cat_r1_command))
-#         if not Path.joinpath(aggr_dir,sample+'_R2.fq.gz').exists():
-#             cat_r2_command = u_df.File_R2.values.tolist()
-#             cat_r2_command.insert(0,'cat')
-#             cat_r2_command.append('> ' + str(aggr_dir) + '/' + sample + '_R2.fq.gz')
-#             os.system(' '.join(cat_r2_command))
-#         Path('workflow', 'data', config['User'], config['Project'], 'fastqs', sample).symlink_to(aggr_dir)
-#
-# samples = fetch_fqR1R2(samples, "samples", config)
-
 def parse_suffix(rule):
     ## Given a rule name, return the suffix of its corresponding output file
     ## rule should be renamed, consider it later.
@@ -262,20 +202,6 @@ def parse_suffix(rule):
         return 'count.log'
     elif rule == "velocyto":
         return 'velocyto.loom'
-
-# def get_table():
-#     return units if config['Units'] is not None else samples if config['Units'] is None else ''
-
-# def get_aggr_output():
-#     if config['Units'] is None:
-#         return ''
-#     else:
-#         if units["Sample"].duplicated().any():
-#             units_sub = units[['User','Project','Sample']].drop_duplicates()
-#             return list(expand("workflow/data/{user}/{project}/fastqs/{sample}_{suffix}", 
-#             user=units_sub.User.to_list(), project=units_sub.Project.to_list(), sample=units_sub.Sample.to_list(), suffix=['R1.fq.gz','R2.fq.gz']))
-#         else:
-#             return ''
 
 def get_r1_aggr_input(wc):
     s_df = units[units['Sample']==wc.sample]
