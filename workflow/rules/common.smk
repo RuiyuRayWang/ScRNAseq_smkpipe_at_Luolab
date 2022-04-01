@@ -13,6 +13,8 @@ from itertools import chain
 # import yaml
 # with open ('config/config_example.yaml') as f:
 #     config = yaml.safe_load(f)
+# with open ('config/config.yaml') as f:
+#     config = yaml.safe_load(f)
 
 # Project Initialization
 samples = (
@@ -45,19 +47,8 @@ def init_paths(sub_dir):
 for sub_dir in sub_dirs:
     init_paths(sub_dir)
 
-### Source data dirs
-if Path('workflow', 'data', config['User'], config['Project'], 'raw_fastqs').is_symlink():
-    os.remove(str(Path('workflow', 'data', config['User'], config['Project'], 'raw_fastqs')))
-if not Path('workflow', 'data', config['User'], config['Project'], 'raw_fastqs').exists():
-    if config['src_fq_dir'] is None:
-        raise ValueError('Missing input fastq files.')
-    else:
-        Path('workflow', 'data', config['User'], config['Project'], 'raw_fastqs').symlink_to(config['src_fq_dir'])
-elif not Path('workflow', 'data', config['User'], config['Project'], 'raw_fastqs').is_symlink():
-    config['src_fq_dir'] = Path('workflow', 'data', config['User'], config['Project'], 'raw_fastqs')
-
 ## 
-def rget_fq_exts(src_dir, target, extensions):
+def rget_fq_by_target_ext(src_dir, target, extensions):
     # fq = []
     # for ext in extensions:
         # fq = glob.glob(src_dir+'/**/'+target+'**'+ext, recursive=True)
@@ -69,26 +60,43 @@ def rget_fq_exts(src_dir, target, extensions):
         raise ValueError('No fastq found for target: ' + target + '! Execution halted.')
     return str(fq[0])
 
+def rget_path_by_lib(src_dir, target, extensions):
+    lib = sorted(Path(src_dir).resolve().rglob(target+'/'))
+    if len(lib)>1:
+        raise ValueError('More than one fastq found for target: ' + target + '! Execution halted.')
+    elif len(lib)==0:
+        raise ValueError('No fastq found for target: ' + target + '! Execution halted.')
+    return str(lib[0])
+
+def rget_fq_by_ext(src_dir, extensions):
+    fq = list(set(chain(*[glob.glob(src_dir+'/**'+ext, recursive=True) for ext in extensions])))
+    if len(fq)>1:
+        raise ValueError('More than one fastq found for target: ' + target + '! Execution halted.')
+    elif len(fq)==0:
+        raise ValueError('No fastq found for target: ' + target + '! Execution halted.')
+    return str(fq[0])
+
 def fetch_units_fq(units, config):
+    target = 'Library'
     fq_r1_extensions = config['r1_extensions']
     fq_r2_extensions = config['r2_extensions']
     for index, row in units.iterrows():
         src_dir = os.path.join("workflow", "data", row.User, row.Project, 'raw_fastqs')
-        units.at[index,'path_to_R1'] = rget_fq_exts(src_dir, row['Library'], fq_r1_extensions)
-        units.at[index,'path_to_R2'] = rget_fq_exts(src_dir, row['Library'], fq_r2_extensions)
+        units.at[index,'path_to_R1'] = rget_fq_by_target_ext(src_dir, row['Library'], fq_r1_extensions)
+        units.at[index,'path_to_R2'] = rget_fq_by_target_ext(src_dir, row['Library'], fq_r2_extensions)
         units.at[index,'File_R1'] = os.path.basename(units.at[index,'path_to_R1'])
         units.at[index,'File_R2'] = os.path.basename(units.at[index,'path_to_R2'])
 
-# def fetch_table_fqs(table, table_type, config):
-#     # If table is units, target='Library'; else if table is samples, target='Sample'
-#     target = 'Library' if table_type=='units' else 'Sample' if table_type=='samples' else None
-#     fq_r1_extensions = config['r1_extensions']
-#     fq_r2_extensions = config['r2_extensions']
-#     src_base = 'raw_fastqs' if target=='Library' else 'fastqs' if target == 'Sample' else None
-#     for index, row in table.iterrows():
-#         src_dir = os.path.join("workflow", "data", row.User, row.Project, src_base)
-#         table.at[index,'path_to_R1'] = rget_fq_exts(src_dir, row[target], fq_r1_extensions)
-#         table.at[index,'path_to_R2'] = rget_fq_exts(src_dir, row[target], fq_r2_extensions)
+def fetch_sample_dir(samples, config):
+    # If table is units, target='Library'; else if table is samples, target='Sample'
+    # target = 'Library' if table_type=='units' else 'Sample' if table_type=='samples' else None
+    target = 'Library'
+    fq_r1_extensions = config['r1_extensions']
+    fq_r2_extensions = config['r2_extensions']
+    # src_base = 'raw_fastqs' if table_type=='units' else 'fastqs' if table_type=='samples' else None
+    src_dir = config['src_fq_dir']
+    for index, row in samples.iterrows():
+        samples.at[index,'path_to_fq'] = rget_path_by_lib(src_dir, row[target], fq_r1_extensions)
 
 if config['Units'] is not None:
     # Case 1: some sample gets re-sequenced to gain deeper depth
@@ -97,6 +105,17 @@ if config['Units'] is not None:
         .set_index("Library", drop=False)
         .sort_index()
     )
+
+    ### Dirs to source data
+    if Path('workflow', 'data', config['User'], config['Project'], 'raw_fastqs').is_symlink():
+        os.remove(str(Path('workflow', 'data', config['User'], config['Project'], 'raw_fastqs')))
+    if not Path('workflow', 'data', config['User'], config['Project'], 'raw_fastqs').exists():
+        if config['src_fq_dir'] is None:
+            raise ValueError('Missing input fastq files.')
+        else:
+            Path('workflow', 'data', config['User'], config['Project'], 'raw_fastqs').symlink_to(config['src_fq_dir'])
+    elif not Path('workflow', 'data', config['User'], config['Project'], 'raw_fastqs').is_symlink():
+        config['src_fq_dir'] = Path('workflow', 'data', config['User'], config['Project'], 'raw_fastqs')
 
     # units.Library must be unique
     # if not units["Library"].is_unique:
@@ -137,8 +156,18 @@ if config['Units'] is not None:
             samples.at[sample, 'File_R2'] = '_'.join([sample,'R2.fq.gz'])
 else:
     # Case 2: one sample per library, no re-sequencing
-
-
+    fetch_sample_dir(samples, config)
+    fq_r1_extensions = ['*'+x for x in config['r1_extensions']]
+    fq_r2_extensions = config['r2_extensions']
+    for index, row in samples.iterrows():
+        ## Re-initialize symlink on every run
+        if Path('workflow', 'data', config['User'], config['Project'], 'fastqs', row['Sample']).exists():
+            os.remove(str(Path('workflow', 'data', config['User'], config['Project'], 'fastqs', row['Sample'])))
+        Path('workflow', 'data', config['User'], config['Project'], 'fastqs', row['Sample']).symlink_to(row['path_to_fq'])
+        samples.at[index,'path_to_R1'] = rget_fq_by_ext(row['path_to_fq'], fq_r1_extensions)
+        samples.at[index,'path_to_R2'] = rget_fq_by_ext(row['path_to_fq'], fq_r2_extensions)
+        samples.at[index,'File_R1'] = os.path.basename(samples.at[index,'path_to_R1'])
+        samples.at[index,'File_R2'] = os.path.basename(samples.at[index,'path_to_R2'])
 
 
 # ## Deprecated
@@ -164,12 +193,12 @@ else:
 #     for index, row in table.iterrows():
 #         if table_type == "units":
 #             src_dir = os.path.join("workflow", "data", row.User, row.Project, "raw_fastqs")
-#             table.at[index,'File_R1'] = rget_fq_exts(src_dir, row.Library, fq_r1_extensions)
-#             table.at[index,'File_R2'] = rget_fq_exts(src_dir, row.Library, fq_r2_extensions)
+#             table.at[index,'File_R1'] = rget_fq_by_exts(src_dir, row.Library, fq_r1_extensions)
+#             table.at[index,'File_R2'] = rget_fq_by_exts(src_dir, row.Library, fq_r2_extensions)
 #         elif table_type == "samples":
 #             src_dir = os.path.join("workflow", "data", row.User, row.Project, "fastqs")
-#             table.at[index,'path_to_R1'] = rget_fq_exts(src_dir, row.Sample, fq_r1_extensions)
-#             table.at[index,'path_to_R2'] = rget_fq_exts(src_dir, row.Sample, fq_r2_extensions)
+#             table.at[index,'path_to_R1'] = rget_fq_by_exts(src_dir, row.Sample, fq_r1_extensions)
+#             table.at[index,'path_to_R2'] = rget_fq_by_exts(src_dir, row.Sample, fq_r2_extensions)
 #             table.at[index,'File_R1'] = os.path.basename(table.at[index,'path_to_R1'])
 #             table.at[index,'File_R2'] = os.path.basename(table.at[index,'path_to_R2'])
 #     return table
@@ -234,8 +263,27 @@ def parse_suffix(rule):
     elif rule == "velocyto":
         return 'velocyto.loom'
 
-def get_table(tab):
-    return units if tab=="units" else sample if tab=="samples" else None
+# def get_table():
+#     return units if config['Units'] is not None else samples if config['Units'] is None else ''
+
+# def get_aggr_output():
+#     if config['Units'] is None:
+#         return ''
+#     else:
+#         if units["Sample"].duplicated().any():
+#             units_sub = units[['User','Project','Sample']].drop_duplicates()
+#             return list(expand("workflow/data/{user}/{project}/fastqs/{sample}_{suffix}", 
+#             user=units_sub.User.to_list(), project=units_sub.Project.to_list(), sample=units_sub.Sample.to_list(), suffix=['R1.fq.gz','R2.fq.gz']))
+#         else:
+#             return ''
+
+def get_r1_aggr_input(wc):
+    s_df = units[units['Sample']==wc.sample]
+    return s_df.path_to_R1.values.tolist()
+
+def get_r2_aggr_input(wc):
+    s_df = units[units['Sample']==wc.sample]
+    return s_df.path_to_R2.values.tolist()
 
 def get_files(rule):
     files = expand(
@@ -286,7 +334,7 @@ def get_report_output():
     return list(set(expand("workflow/data/{user}/{project}/outs/{project}_{suffix}", 
     zip, user=samples.User.to_list(), project=samples.Project.to_list(), suffix=['stats.csv','reads_stats.pdf','reads_stats.html'])))
 
-def get_aggr_output():
+def get_final_output():
     if config['RNA_velocity']:
         return list(set(expand("workflow/data/{user}/{project}/outs/{project}_{suffix}", 
         zip, user=samples.User.to_list(), project=samples.Project.to_list(), suffix=['counts_all.tsv.gz','velocyto_all.loom'])))

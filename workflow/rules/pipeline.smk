@@ -1,20 +1,40 @@
 # Step 0: Aggregate fastqs
-rule aggr_fqs:
+# rule aggr_fqs:
+#     input:
+#         get_table
+#     output:
+#         "workflow/data/{user}/{project}/fastqs/{sample}/{sample}_R1.fq.gz",
+#         "workflow/data/{user}/{project}/fastqs/{sample}/{sample}_R2.fq.gz",
+#     threads:
+#         1
+#     script:
+#         "../scripts/aggr_fqs.py"
+
+rule aggr_r1_fqs:
     input:
-        get_table('units')
+        unpack(get_r1_aggr_input)
     output:
-    
-    conda:
-        "../envs/master.yaml"
+        "workflow/data/{user}/{project}/fastqs/{sample}/{sample}_R1.fq.gz",
     threads:
         1
-    script:
-        "../scripts/aggr_fqs.py"
+    shell:
+        "cat {input} > {output}"
+
+rule aggr_r2_fqs:
+    input:
+        unpack(get_r2_aggr_input)
+    output:
+        "workflow/data/{user}/{project}/fastqs/{sample}/{sample}_R2.fq.gz",
+    threads:
+        1
+    shell:
+        "cat {input} > {output}"
 
 # Step 1: Identify cell barcode whitelist (identify correct BC)
 rule umi_tools_whitelist:
     input:
         unpack(get_fastqs),
+        # tmp="tmp/aggr_fqs.done",
     output:
         "workflow/data/{user}/{project}/alignments/{sample}/{sample}_whitelist.txt",
         report("workflow/data/{user}/{project}/alignments/{sample}/{sample}_cell_barcode_counts.png", caption="../report/umi_tools_whitelist.rst", category="umi_tools")
