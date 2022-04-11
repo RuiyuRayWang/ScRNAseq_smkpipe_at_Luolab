@@ -107,21 +107,7 @@ You should see a `report.html` output in your current working directory.
 
 ## Notes
 
-* 2022/4/1:
-Updates: introducing samples-units feature.  
-For some studies, the same sample may be re-sequenced in order to achieve higher sequencing depth. We denote these different `units` of the `samples`. Now, users can specify these info in the `config/units_table.csv`. The pipeline will aggregate different `units` of the same `sample` before running the pipeline. In doing so, we're able to obtain quality control stats on the sample level. Note that we assume that small technical batch effects arose from different sequencing runs.  
-For studies without re-sequenced files, the previous workflow still works by leaving empty the `Units` slot in the `config/config.yaml`, and specifying only `config/sample_table.csv`.
-
-* 2022/3/23:  
-Updates: introducing RNA velocity analysis into the pipeline, through [`velocyto`](http://velocyto.org/).  
-Each assigned sorted bam file was run against `velocyto` through CLI, and a loom object was generated. After loom files for all libraries were generated, they were aggregated into a single loom object.
-
-* 2022/2/17:  
-Updates: incorporated snakemake `report` feature to generate runtime summaries and quality controls (QCs) of jobs.  
-Due to a weird conflict between snakemake internal mechanism and the way we handle STAR Shared memory feature, the report mechanism can be only instantiated in a separate branch apart from the `main` branch. See [report section](#generate-snakemake-report-for-jobs) in this doc.
-
-* 2022/2/1:  
-  To avoid misunderstanding from the users, a clarification should be made: the scRNA-seq protocol used in Luolab, for which this repo is design for, is NOT entirely the same as the standard Smartseq2 protocol described in [Picelli et al. (2013)](https://www.nature.com/articles/nmeth.2639).  
+* To avoid misunderstanding from the users, a clarification should be made: the scRNA-seq protocol used in Luolab, for which this repo is design for, is NOT entirely the same as the standard Smartseq2 protocol described in [Picelli et al. (2013)](https://www.nature.com/articles/nmeth.2639).  
   
   The protocol was modified in a way that resembles **a hybrid of Smartseq2 and STRTseq** ([Islam et al., 2011](https://genome.cshlp.org/content/21/7/1160)). A major distinction between the Smartseq2 and our method is that in the standard Smartseq2, one library stands for one cell; whereas in our method, 48 cells are multiplex in a single library, and later demultiplexed by cell barcodes. One advantage of this strategy is that it can alleviate the high manual labors involved in the standard Smartseq2 protocol.  
 
