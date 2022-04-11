@@ -90,7 +90,7 @@ rule STAR_gen:
         directory(config["genome_index"])
     params:
         sjdbOverhang=config["sjdbOverhang"]
-    cache: True
+    # cache: True
     conda:
         "../envs/master.yaml"
     threads:
@@ -215,7 +215,7 @@ rule sambamba_sort:
                       {input}
         """
 
-# (Optional) Step 7-1: Parse CB UB tag
+# (If RNA_velocity == True) Step 7-1: Parse CB UB tag
 rule pysam:
     input:
         "workflow/data/{user}/{project}/alignments/{sample}/{sample}_assigned_sorted.bam",
@@ -251,15 +251,16 @@ rule pre_sort:
 # Step 7-3: Generate velocyto loom file
 rule velocyto:
     input:
+        tagged=get_files('tagged'),
         bam="workflow/data/{user}/{project}/alignments/{sample}/{sample}_tagged.bam",
         sorted_bam="workflow/data/{user}/{project}/alignments/{sample}/cellsorted_{sample}_tagged.bam",
         gtf=config["gtf_annotation"]
     output:
-        temp("workflow/data/{user}/{project}/alignments/{sample}/{sample}_velocyto.loom")
+        "workflow/data/{user}/{project}/alignments/{sample}/{sample}_velocyto.loom"
     conda:
         "../envs/velocyto.yaml"
     threads:
-        16
+        10
     shell:
         """
         velocyto run -o workflow/data/{wildcards.user}/{wildcards.project}/alignments/{wildcards.sample} \

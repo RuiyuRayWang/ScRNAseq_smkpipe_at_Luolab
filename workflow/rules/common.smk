@@ -200,6 +200,8 @@ def parse_suffix(rule):
         return 'extract.log'
     elif rule == "log_count":
         return 'count.log'
+    elif rule == "tagged":
+        return 'tagged.bam'
     elif rule == "velocyto":
         return 'velocyto.loom'
 
