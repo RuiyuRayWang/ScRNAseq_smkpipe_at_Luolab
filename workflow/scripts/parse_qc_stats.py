@@ -1,3 +1,4 @@
+import os
 import re
 import numpy as np
 import pandas as pd
@@ -31,7 +32,7 @@ def parse_qc_regex(rule, stat):
             ## whitelist: unique cell barcodes
             return r"^.*(?:Found) (\d+) (?:unique cell barcodes)$"
         elif stat=="n_reads_selected":
-            ## whitelist: 
+            ## whitelist: how many reads have a cell barcode in the whitelist
             return r"^.*(?:Found) (\d+) (?:total reads matching the selected cell barcodes)$"
         elif stat=="n_reads_correctable":
             ## whitelist: error correctable reads
@@ -69,7 +70,8 @@ def parse_qc_regex(rule, stat):
 ## STAR: Unique mapped, valid barcode & UMI reads
 
 def parse_logfiles(logfile, rule):
-    library = re.search("^.*/([^_]*)_([^_]*).log$", logfile).group(1)
+    l_name = os.path.basename(logfile)
+    library = re.search("(.*)(?:_whitelist\.log|_count\.log|_extract\.log)", l_name).group(1)
     if rule == 'whitelist':
         return {
             'Library': library,

@@ -9,4 +9,4 @@ rule all:
     # Final outputs
         parse_dynamic_output('append_sfx'),
         get_report_output(),
-        get_aggr_output()
+        get_final_output()
