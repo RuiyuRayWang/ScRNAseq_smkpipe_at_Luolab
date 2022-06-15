@@ -251,6 +251,12 @@ def parse_STAR_dummy(wc):
     else:
         return "tmp/STARload.done"
 
+def get_mask():
+    if config['repeat_mask'] is None:
+        return ''
+    else:
+        return "-m " + config['repeat_mask'] + " "
+
 def parse_fc_dummy(wc):
     output = os.path.join("workflow", "data", wc.user, wc.project, "alignments", wc.sample, wc.sample) + "_gene_assigned"
     if os.path.exists(output):

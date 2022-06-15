@@ -249,7 +249,7 @@ velocyto run -o . -e LIBRARY_velocyto LIBRARY_tagged.bam /path/to/gtf
 import loompy
 loompy.combine()
 
-# Step 9: Count UMIs per gene per cell
+# Step 8: Count UMIs per gene per cell
 umi_tools count --per-gene \
                 --per-cell \
                 --gene-tag=XT \
@@ -257,10 +257,10 @@ umi_tools count --per-gene \
                 --stdin=LIBRARY_assigned_sorted.bam \
                 --stdout=LIBRARY_counts.tsv.gz
 
-# Step 10: Append suffix to cells
+# Step 9: Append suffix to cells
 (implemented by scripts/append_suffix.py)
 
-# Step 11: Aggregate counts
+# Step 10: Aggregate counts
 zcat LIBRARY1_counts.tsv.gz LIBRARY2_counts.tsv.gz ... | gzip > outs/PROJECT_counts_all.tsv.gz
 ```
 

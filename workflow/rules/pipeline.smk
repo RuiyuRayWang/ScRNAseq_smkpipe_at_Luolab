@@ -97,6 +97,7 @@ rule STAR_gen:
         config["threads"]
     shell:
         """
+        mkdir config["genome_index"]
         STAR --runThreadN {threads} \
              --runMode genomeGenerate \
              --genomeDir {output} \
@@ -130,7 +131,7 @@ rule STAR:
         extracted_fq="workflow/data/{user}/{project}/alignments/{sample}/{sample}_extracted.fq.gz",
         genomeDir=config["genome_index"],
         # dummy="tmp/STARload.done"
-        dummy=parse_STAR_dummy,
+        # dummy=parse_STAR_dummy,
     output:
         bam="workflow/data/{user}/{project}/alignments/{sample}/{sample}_Aligned.sortedByCoord.out.bam",
         lf=report("workflow/data/{user}/{project}/alignments/{sample}/{sample}_Log.final.out", caption="../report/STAR.rst", category="STAR")
@@ -252,11 +253,13 @@ rule pre_sort:
 rule velocyto:
     input:
         tagged=get_files('tagged'),
-        bam="workflow/data/{user}/{project}/alignments/{sample}/{sample}_tagged.bam",
         sorted_bam="workflow/data/{user}/{project}/alignments/{sample}/cellsorted_{sample}_tagged.bam",
+        bam="workflow/data/{user}/{project}/alignments/{sample}/{sample}_tagged.bam",
         gtf=config["gtf_annotation"]
     output:
         "workflow/data/{user}/{project}/alignments/{sample}/{sample}_velocyto.loom"
+    params:
+        mask=get_mask()
     conda:
         "../envs/velocyto.yaml"
     threads:
@@ -266,7 +269,8 @@ rule velocyto:
         velocyto run -o workflow/data/{wildcards.user}/{wildcards.project}/alignments/{wildcards.sample} \
                      -v \
                      -e {wildcards.sample}_velocyto \
-                     {input.bam} \
+                     {params.mask}\
+                     {params.bam} \
                      {input.gtf}
         """
 

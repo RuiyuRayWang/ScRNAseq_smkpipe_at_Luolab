@@ -19,6 +19,7 @@ genome_fa:
   - "/mnt/ZA1BT1ER/RESOURCES/ensembl/release_102/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna_rm.primary_assembly.fa"
 gtf_annotation: /mnt/ZA1BT1ER/RESOURCES/ensembl/release_102/gtf/mus_musculus/Mus_musculus.GRCm38.102.chr.gtf
 genome_index: /mnt/ZA1BT1ER/INDICES/STAR/STAR_279a_GRCm38_102_dna_rm
+repeat_mask:
 sjdbOverhang: "149"
 
 ground_truth: config/barcode_ground_truth_checklist_example.csv
